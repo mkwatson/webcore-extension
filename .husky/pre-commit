@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
 # Enforce using the commit script for all commits
 if [ -z "$USING_COMMIT_SCRIPT" ]; then

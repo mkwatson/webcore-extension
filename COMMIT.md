@@ -26,6 +26,7 @@ npm run c -- <type> "<subject>" ["<body paragraph 1>" "<body paragraph 2>"]
 | `build`    | Build system or dependency changes     | -              |
 | `ci`       | CI configuration changes               | -              |
 | `chore`    | Other changes (no production code)     | -              |
+| `revert`   | Revert to a previous commit            | -              |
 
 ## 🚨 Breaking Changes
 

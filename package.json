@@ -7,7 +7,6 @@
     "build": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
     "watch": "tsc --watch",
     "test": "echo \"No tests specified yet\"",
-    "commit": "cz",
     "c": "node scripts/commit.js",
     "prepare": "husky",
     "release": "release-it",
@@ -29,16 +28,9 @@
     "@release-it/conventional-changelog": "^10.0.0",
     "@types/chrome": "^0.0.313",
     "auto-changelog": "^2.5.0",
-    "commitizen": "^4.3.0",
     "copyfiles": "^2.4.1",
-    "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.0.11",
-    "release-it": "^17.1.1",
+    "release-it": "^18.0.0",
     "typescript": "^5.8.3"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
