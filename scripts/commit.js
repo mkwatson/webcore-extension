@@ -31,9 +31,12 @@ if (args.length < 2) {
   console.log('  build    - Build system changes');
   console.log('  ci       - CI configuration changes');
   console.log('  chore    - Other changes (no production code change)');
+  console.log('  revert   - Revert to a previous commit');
   console.log('\nExamples:');
-  console.log('  npm run c -- feat "add login page" "Implements user authentication" "Closes #42"');
-  console.log('  npm run c -- fix "resolve memory leak"');
+  console.log('  npm run c -- feat "add dark mode" "Implements a new dark mode theme" "Closes #123"');
+  console.log('  npm run c -- fix "resolve memory leak in video player"');
+  console.log('  npm run c -- docs "update installation instructions"');
+  console.log('  npm run c -- refactor "rewrite data processing logic" "BREAKING CHANGE: completely changes the output format"');
   console.log('\nAdd BREAKING CHANGE: in the body to trigger a major version bump.\n');
   process.exit(1);
 }
@@ -63,8 +66,12 @@ try {
   // Set environment variable to indicate we're using the commit script
   process.env.USING_COMMIT_SCRIPT = 'true';
   
-  // Run pre-commit hooks if any
-  execSync('npm test', { stdio: 'inherit' });
+  // Run tests only for code-related changes
+  const codeRelatedTypes = ['feat', 'fix', 'refactor', 'perf'];
+  if (codeRelatedTypes.includes(type)) {
+    console.log('Running tests before commit...');
+    execSync('npm test', { stdio: 'inherit' });
+  }
   
   // Execute the git commit command with the environment variable
   execSync(commitCommand, { 

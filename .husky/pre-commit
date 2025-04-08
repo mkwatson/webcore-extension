@@ -16,5 +16,9 @@ if [ -z "$USING_COMMIT_SCRIPT" ]; then
   exit 1
 fi
 
+# Sync version in manifest.json with package.json
+echo "Syncing versions..."
+node scripts/sync-version.js
+
 # Continue with the commit if using our script
 exit 0

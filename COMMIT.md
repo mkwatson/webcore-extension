@@ -56,7 +56,7 @@ npm run c -- refactor "rewrite data processing logic" "BREAKING CHANGE: complete
 
 ## 🔄 Automatic Versioning
 
-Commits are automatically analyzed to determine version increments:
+Commits are automatically analyzed by semantic-release to determine version increments:
 
 - `feat:` → Minor version increment (0.1.0 → 0.2.0)
 - `fix:`, `perf:` → Patch version increment (0.1.0 → 0.1.1)
