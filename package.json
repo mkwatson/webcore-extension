@@ -9,11 +9,8 @@
     "test": "echo \"No tests specified yet\"",
     "c": "node scripts/commit.js",
     "prepare": "husky",
-    "release": "release-it",
-    "release:minor": "release-it minor",
-    "release:major": "release-it major",
-    "release:patch": "release-it patch",
-    "release:dry-run": "release-it --dry-run"
+    "sync-version": "node scripts/sync-version.js",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "chrome",
@@ -25,12 +22,14 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.3",
     "@commitlint/config-conventional": "^19.0.3",
-    "@release-it/conventional-changelog": "^10.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
     "@types/chrome": "^0.0.313",
     "auto-changelog": "^2.5.0",
     "copyfiles": "^2.4.1",
     "husky": "^9.0.11",
-    "release-it": "^18.0.0",
+    "semantic-release": "^24.2.3",
     "typescript": "^5.8.3"
   }
 }

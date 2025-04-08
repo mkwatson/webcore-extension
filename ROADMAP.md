@@ -17,7 +17,7 @@ Our immediate focus is on establishing the fundamental infrastructure needed for
    - Auto-create GitHub releases when version changes [COMPLETED]
    - Attach built extension ZIP to releases [COMPLETED]
    - Generate proper release notes from commits [COMPLETED]
-   - Streamline the release process [PLANNED]
+   - Streamline the release process [COMPLETED]
 
 3. **Basic Testing Framework** [PLANNED]
    - Set up Jest or similar for unit testing core functionality

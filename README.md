@@ -32,14 +32,22 @@ This project follows [Semantic Versioning](https://semver.org/) (SemVer) convent
 
 ### Creating Releases
 
-To create a new release:
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release) to automate versioning and releases based on commit messages.
 
-1. Make sure all changes are committed using the conventional format
-2. Run one of the following commands:
-   - `npm run release` - Let the system determine the version increment
-   - `npm run release:patch` - For a patch release (bug fixes)
-   - `npm run release:minor` - For a minor release (new features)
-   - `npm run release:major` - For a major release (breaking changes)
+#### Automatic Releases
+Merging to the main branch will automatically:
+- Determine the next version based on commit types
+- Update CHANGELOG.md
+- Create a GitHub release with release notes
+- Attach the built extension to the release
+
+#### Manual Releases
+To manually trigger a release:
+1. Go to Actions tab in GitHub
+2. Select "CI/CD Pipeline"
+3. Click "Run workflow"
+4. Optionally select a specific release type (patch/minor/major)
+5. Click "Run workflow"
 
 ## License
 
