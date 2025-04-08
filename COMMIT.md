@@ -36,7 +36,7 @@ To indicate a breaking change, add `BREAKING CHANGE:` to the commit body:
 npm run c -- feat "completely redesign API" "BREAKING CHANGE: This changes the core API interface"
 ```
 
-This will trigger a MAJOR version increment.
+This will trigger a MAJOR version increment (or a MINOR increment if still in 0.x.x development phase).
 
 ## 📚 Examples
 
@@ -58,9 +58,11 @@ npm run c -- refactor "rewrite data processing logic" "BREAKING CHANGE: complete
 
 Commits are automatically analyzed to determine version increments:
 
-- `feat:` → Minor version increment (1.0.0 → 1.1.0)
-- `fix:`, `perf:` → Patch version increment (1.0.0 → 1.0.1)
-- `BREAKING CHANGE:` → Major version increment (1.0.0 → 2.0.0)
+- `feat:` → Minor version increment (0.1.0 → 0.2.0)
+- `fix:`, `perf:` → Patch version increment (0.1.0 → 0.1.1)
+- `BREAKING CHANGE:` → Major version increment (1.0.0 → 2.0.0) or Minor increment during 0.x.x development (0.1.0 → 0.2.0)
+
+> **Note**: During 0.x.x development phase, breaking changes increment the minor version rather than the major version. Major version will remain at 0 until we reach a stable 1.0.0 release.
 
 This automation ensures our versioning accurately reflects the nature of changes.
 

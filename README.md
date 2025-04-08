@@ -24,8 +24,10 @@ This project uses Conventional Commits for versioning. Please read [COMMIT.md](C
 
 This project follows [Semantic Versioning](https://semver.org/) (SemVer) conventions:
 
+- **Current Development Phase (0.x.y)**: The project is in initial development. APIs may change and breaking changes can occur in minor (0.x.0) releases.
+- **Future Stable Release (1.0.0)**: Will indicate the first stable, production-ready release with defined public API.
 - **Major version (x.0.0)**: Incompatible API changes
-- **Minor version (0.x.0)**: New functionality in a backward compatible manner
+- **Minor version (0.x.0)**: New functionality (may include breaking changes before 1.0.0)
 - **Patch version (0.0.x)**: Backward compatible bug fixes
 
 ### Creating Releases

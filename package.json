@@ -1,6 +1,6 @@
 {
   "name": "webcore-extension",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Chrome extension for WebCore",
   "scripts": {
     "clean": "rm -rf dist/*",
