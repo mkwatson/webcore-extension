@@ -1,0 +1,23 @@
+{
+  "name": "webcore-extension",
+  "version": "1.0.0",
+  "description": "A Chrome extension for WebCore",
+  "scripts": {
+    "clean": "rm -rf dist/*",
+    "build": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+    "watch": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "webcore"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "^0.0.313",
+    "copyfiles": "^2.4.1",
+    "typescript": "^5.8.3"
+  }
+}
