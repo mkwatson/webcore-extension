@@ -8,7 +8,7 @@
     "watch": "tsc --watch",
     "test": "echo \"No tests specified yet\"",
     "commit": "cz",
-    "commit:direct": "node scripts/commit.js",
+    "c": "node scripts/commit.js",
     "prepare": "husky",
     "release": "release-it",
     "release:minor": "release-it minor",

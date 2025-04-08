@@ -14,7 +14,11 @@ A Chrome extension for WebCore.
 - `npm run build` - Build the extension
 - `npm run watch` - Watch for file changes and rebuild automatically
 - `npm run clean` - Clean the build directory
-- `npm run commit` - Use the interactive commit tool to format commit messages
+- `npm run c` - Create a conventional commit (recommended)
+
+## Contributing
+
+This project uses Conventional Commits for versioning. Please read [COMMIT.md](COMMIT.md) before contributing.
 
 ## Semantic Versioning
 
@@ -23,29 +27,6 @@ This project follows [Semantic Versioning](https://semver.org/) (SemVer) convent
 - **Major version (x.0.0)**: Incompatible API changes
 - **Minor version (0.x.0)**: New functionality in a backward compatible manner
 - **Patch version (0.0.x)**: Backward compatible bug fixes
-
-### Commit Message Format
-
-We use conventional commits to automate versioning. Format your commit messages as:
-
-```
-<type>: <description>
-
-[optional body]
-
-[optional footer]
-```
-
-Where `<type>` is one of:
-- **feat**: A new feature (increments minor version)
-- **fix**: A bug fix (increments patch version)
-- **docs**: Documentation changes
-- **style**: Code style changes (formatting, etc.)
-- **refactor**: Code refactoring
-- **test**: Adding or updating tests
-- **chore**: Maintenance tasks
-
-Adding `BREAKING CHANGE:` to the footer of a commit will trigger a major version bump.
 
 ### Creating Releases
 

@@ -1,1 +1,20 @@
-npm test
+#!/usr/bin/env sh
+
+# Enforce using the commit script for all commits
+if [ -z "$USING_COMMIT_SCRIPT" ]; then
+  echo ""
+  echo "❌ Direct commits are not allowed! Please use our commit script:"
+  echo ""
+  echo "  npm run c -- <type> \"<subject>\" [\"<body>\"]"
+  echo ""
+  echo "Examples:"
+  echo "  npm run c -- feat \"add new feature\" \"This adds XYZ functionality\""
+  echo "  npm run c -- fix \"fix memory leak\" \"Resolves issue with X\""
+  echo ""
+  echo "For more information, run: npm run c"
+  echo ""
+  exit 1
+fi
+
+# Continue with the commit if using our script
+exit 0
