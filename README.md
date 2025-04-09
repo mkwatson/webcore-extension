@@ -19,6 +19,22 @@ A Chrome extension for WebCore.
 - `npm run validate` - Run linting, tests, and build
 - `npm run package` - Build and package the extension as a ZIP file
 
+## Testing
+
+The project uses Jest for unit testing with TypeScript support:
+
+- `npm test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode (great for development)
+- `npm run test:coverage` - Generate a coverage report
+
+Tests are organized in the `tests` directory mirroring the source code structure:
+- `tests/mocks` - Contains Chrome API mocks
+- `tests/unit` - Unit tests for utilities and standalone functions
+- `tests/background` - Tests for background scripts
+- `tests/popup` - Tests for popup functionality
+
+See [TESTING.md](TESTING.md) for detailed testing conventions and examples.
+
 ## Contributing
 
 This project uses Conventional Commits for versioning. Please read [COMMIT.md](COMMIT.md) before contributing.
