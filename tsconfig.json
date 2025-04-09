@@ -10,7 +10,14 @@
       "outDir": "./dist",
       "rootDir": "./src",
       "sourceMap": true,
-      "lib": ["DOM", "ES2020"]
+      "lib": ["DOM", "ES2020"],
+      
+      /* Additional type-checking options */
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "exactOptionalPropertyTypes": true
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
