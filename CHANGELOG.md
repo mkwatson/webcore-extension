@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/mkwatson/webcore-extension/compare/v1.2.0...v1.3.0) (2025-04-09)
+
+
+### Features
+
+* configure sourcemaps for debugging ([2b1aa59](https://github.com/mkwatson/webcore-extension/commit/2b1aa59066ea9e20671d9aa37a17e5c57fe2f358))
+
 # [1.2.0](https://github.com/mkwatson/webcore-extension/compare/v1.1.0...v1.2.0) (2025-04-09)
 
 
