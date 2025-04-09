@@ -17,8 +17,11 @@ npm-debug.log*
 *.swp
 *.swo
 
-# Including .vscode for shared settings
-!.vscode/
+# VS Code - Include only specific files
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 
 # OS files
 .DS_Store
