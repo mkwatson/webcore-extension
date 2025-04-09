@@ -1,3 +1,5 @@
+## [1.3.1](https://github.com/mkwatson/webcore-extension/compare/v1.3.0...v1.3.1) (2025-04-09)
+
 # [1.3.0](https://github.com/mkwatson/webcore-extension/compare/v1.2.0...v1.3.0) (2025-04-09)
 
 
