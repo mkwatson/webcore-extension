@@ -5,12 +5,17 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+    "build:watch": "npm run clean && tsc --watch & npm run copy:watch",
+    "copy:watch": "nodemon --watch src --ext html,css,json,png,svg,jpg --exec \"copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup\"",
     "watch": "tsc --watch",
     "test": "echo \"No tests specified yet\"",
     "c": "node scripts/commit.js",
     "prepare": "husky",
     "sync-version": "node scripts/sync-version.js",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "lint": "echo \"No linting configured yet\"",
+    "validate": "npm run lint && npm run test && npm run build",
+    "package": "npm run build && cd dist && zip -r ../extension.zip ."
   },
   "keywords": [
     "chrome",
@@ -29,6 +34,7 @@
     "auto-changelog": "^2.5.0",
     "copyfiles": "^2.4.1",
     "husky": "^9.0.11",
+    "nodemon": "^3.1.9",
     "semantic-release": "^24.2.3",
     "typescript": "^5.8.3"
   }
