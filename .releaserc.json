@@ -1,5 +1,11 @@
 {
-  "branches": ["main"],
+  "branches": [
+    {
+      "name": "main",
+      "prerelease": false,
+      "channel": "latest"
+    }
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -11,7 +17,10 @@
     }],
     ["@semantic-release/git", {
       "assets": ["package.json", "src/manifest.json", "CHANGELOG.md"],
-      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+      "gitUserName": "semantic-release-bot",
+      "gitUserEmail": "semantic-release-bot@users.noreply.github.com",
+      "commitOptions": ["--no-verify"]
     }],
     ["@semantic-release/github", {
       "assets": [
