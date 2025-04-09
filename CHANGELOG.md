@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/mkwatson/webcore-extension/compare/v1.0.2...v1.1.0) (2025-04-09)
+
+
+### Bug Fixes
+
+* replace console.log with console.warn ([cb3ecf5](https://github.com/mkwatson/webcore-extension/commit/cb3ecf5a70800b7987b63880c3484e1e66559c48))
+
+
+### Features
+
+* add ESLint and Prettier setup ([677153b](https://github.com/mkwatson/webcore-extension/commit/677153b64464f6703073f89fa677566d888c982f))
+
 ## [1.0.2](https://github.com/mkwatson/webcore-extension/compare/v1.0.1...v1.0.2) (2025-04-09)
 
 ## [1.0.1](https://github.com/mkwatson/webcore-extension/compare/v1.0.0...v1.0.1) (2025-04-09)
