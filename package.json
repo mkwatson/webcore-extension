@@ -4,7 +4,10 @@
   "description": "A Chrome extension for WebCore",
   "scripts": {
     "clean": "rm -rf dist/*",
-    "build": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+    "build": "npm run build:dev",
+    "build:dev": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+    "build:prod": "npm run build:dev && npm run remove-sourcemaps",
+    "remove-sourcemaps": "find dist -name '*.map' -delete",
     "build:watch": "npm run clean && tsc --watch & npm run copy:watch",
     "copy:watch": "nodemon --watch src --ext html,css,json,png,svg,jpg --exec \"copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup\"",
     "watch": "tsc --watch",
@@ -19,7 +22,7 @@
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,html,css}\"",
     "validate": "npm run lint && npm run test && npm run build",
-    "package": "npm run build && cd dist && zip -r ../extension.zip ."
+    "package": "npm run build:prod && cd dist && zip -r ../extension.zip ."
   },
   "keywords": [
     "chrome",

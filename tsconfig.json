@@ -10,6 +10,8 @@
       "outDir": "./dist",
       "rootDir": "./src",
       "sourceMap": true,
+      "inlineSources": true,
+      "sourceRoot": "",
       "lib": ["DOM", "ES2020"],
       
       /* Additional type-checking options */

@@ -14,9 +14,11 @@ npm-debug.log*
 
 # Editor directories and files
 .idea
-.vscode
 *.swp
 *.swo
+
+# Including .vscode for shared settings
+!.vscode/
 
 # OS files
 .DS_Store
