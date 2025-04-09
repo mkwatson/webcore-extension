@@ -27,10 +27,11 @@ This project uses Conventional Commits for versioning. Please read [COMMIT.md](C
 
 This project follows [Semantic Versioning](https://semver.org/) (SemVer) conventions:
 
-- **Initial Release (1.0.0)**: The first stable release of the extension
+- **Current Development Phase (0.x.y)**: The project is in initial development. APIs may change and breaking changes can occur in minor (0.x.0) releases.
+- **Future Stable Release (1.0.0)**: Will indicate the first stable, production-ready release with defined public API.
 - **Major version (x.0.0)**: Incompatible API changes
-- **Minor version (1.x.0)**: New functionality in a backward compatible manner
-- **Patch version (1.0.x)**: Backward compatible bug fixes
+- **Minor version (0.x.0)**: New functionality (may include breaking changes before 1.0.0)
+- **Patch version (0.0.x)**: Backward compatible bug fixes
 
 The extension's manifest.json version is automatically kept in sync with package.json via our sync-version script, which runs before each commit.
 
