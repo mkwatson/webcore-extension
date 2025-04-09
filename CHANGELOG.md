@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/mkwatson/webcore-extension/compare/v1.1.0...v1.2.0) (2025-04-09)
+
+
+### Features
+
+* enhance TypeScript strict mode ([5eb4ab6](https://github.com/mkwatson/webcore-extension/commit/5eb4ab6d04361a3f6d3845d2b945f26a8a260d15))
+
 # [1.1.0](https://github.com/mkwatson/webcore-extension/compare/v1.0.2...v1.1.0) (2025-04-09)
 
 
