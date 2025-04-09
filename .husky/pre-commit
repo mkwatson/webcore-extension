@@ -1,6 +1,21 @@
 #!/usr/bin/env sh
 
-# Enforce using the commit script for all commits
+# Check if this is a semantic-release commit
+COMMIT_MSG_FILE=$(git rev-parse --git-dir)/COMMIT_EDITMSG
+if [ -f "$COMMIT_MSG_FILE" ]; then
+  # If the commit message starts with "chore(release):", allow it through
+  if grep -q "^chore(release):" "$COMMIT_MSG_FILE"; then
+    echo "✅ Detected semantic-release commit, bypassing commit script check"
+    
+    # Sync version in manifest.json with package.json for semantic-release commits too
+    echo "Syncing versions..."
+    node scripts/sync-version.js
+    
+    exit 0
+  fi
+fi
+
+# Enforce using the commit script for all other commits
 if [ -z "$USING_COMMIT_SCRIPT" ]; then
   echo ""
   echo "❌ Direct commits are not allowed! Please use our commit script:"

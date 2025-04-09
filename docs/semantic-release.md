@@ -10,37 +10,60 @@ We use [semantic-release](https://github.com/semantic-release/semantic-release) 
 
 Our project uses Husky to enforce the use of our custom commit script (`npm run c`) for all commits. This ensures consistent commit message formatting.
 
-However, semantic-release needs to create its own commits during the release process to update version numbers and changelogs. To allow this to work smoothly, we've configured semantic-release to use the `--no-verify` flag when creating commits.
+However, semantic-release needs to create its own commits during the release process to update version numbers and changelogs. To allow this to work smoothly, we have implemented two complementary approaches:
 
-### Configuration
+### 1. Local Development: Pattern-based Hook Bypass
 
-In `.releaserc.json`, we've added the following to the `@semantic-release/git` plugin configuration:
+In `.husky/pre-commit`, we:
 
-```json
-"commitOptions": ["--no-verify"]
+1. Check if there is a commit message file
+2. Look for the pattern `chore(release):` at the beginning of the message
+3. If found, we allow the commit to proceed without enforcing our commit script
+4. For all other commits, we continue to enforce using our commit script
+
+This approach is reliable for local development as it works regardless of how semantic-release constructs its Git commands.
+
+### 2. CI Environment: Disabling Husky
+
+In our GitHub Actions workflow, we set the `HUSKY=0` environment variable when running semantic-release:
+
+```yaml
+- name: Semantic Release
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    NODE_ENV: production
+    HUSKY: 0
+  run: npx semantic-release
 ```
 
-This tells semantic-release to skip Git hooks when making commits, allowing it to bypass our pre-commit hook that enforces the use of our commit script.
+This completely disables Husky hooks during the semantic-release process in CI, ensuring that it can create commits without being blocked.
 
-### Why This Approach?
+### Why This Dual Approach?
 
-1. **Clean separation of concerns**: Human developers still use our commit script, while automated tools can bypass it when necessary.
-2. **Standard practice**: This is the recommended approach in the semantic-release documentation.
-3. **Minimal configuration**: Requires only a small change to our semantic-release config.
+1. **Belt and suspenders**: We have a reliable solution for both local development and CI environments
+2. **Precise control**: In development, we specifically allow only semantic-release commits to bypass checks
+3. **Simplicity in CI**: In CI, we disable hooks completely to avoid potential path resolution issues
+4. **Version sync**: We still synchronize the manifest.json version for all commits
 
 ### Testing
 
-You can test if this configuration works by running:
+You can test if the local configuration works by running:
 
 ```bash
-npm run test:semantic-release
+echo "chore(release): 1.0.0" > $(git rev-parse --git-dir)/COMMIT_EDITMSG && .husky/pre-commit
 ```
 
-This script will attempt to make a Git commit with the `--no-verify` flag, which should bypass our Husky pre-commit hook. The test will clean up after itself, so no permanent changes will be made to the repository.
+This simulates a semantic-release commit and should show the hook allowing it through.
+
+To test disabling Husky entirely (like in CI):
+
+```bash
+HUSKY=0 git commit -m "test commit"
+```
 
 ## Related Files
 
+- `.husky/pre-commit` - Contains our pre-commit hook that allows semantic-release commits
+- `scripts/commit.js` - Our custom commit script for human developers
 - `.releaserc.json` - Contains the semantic-release configuration
-- `.husky/pre-commit` - Contains our pre-commit hook that enforces using our commit script
-- `scripts/commit.js` - Our custom commit script
-- `scripts/test-semantic-release-commit.js` - Test script for the `--no-verify` bypass 
+- `.github/workflows/ci-cd.yml` - Contains the CI configuration with Husky disabled for semantic-release 

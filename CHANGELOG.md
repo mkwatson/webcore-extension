@@ -5,4 +5,4 @@ All notable changes to this project will be documented in this file. This file i
 ## Unreleased
 
 ### Fixed
-- Configured semantic-release to use `--no-verify` flag to bypass the pre-commit hook that enforces our commit script 
+- Modified Husky pre-commit hook to detect and allow semantic-release commits, enabling automatic version updates 
