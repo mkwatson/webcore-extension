@@ -31,6 +31,9 @@ if [ -z "$USING_COMMIT_SCRIPT" ]; then
   exit 1
 fi
 
+# Run lint-staged to check code quality
+npx lint-staged
+
 # Sync version in manifest.json with package.json
 echo "Syncing versions..."
 node scripts/sync-version.js
