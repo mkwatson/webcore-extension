@@ -20,10 +20,10 @@ Our immediate focus is on establishing the fundamental infrastructure needed for
    - Generate proper release notes from commits [COMPLETED]
    - Streamline the release process [COMPLETED]
 
-3. **Basic Testing Framework** [PLANNED]
-   - Set up Jest or similar for unit testing core functionality
-   - Implement simple tests for critical functions
-   - Include testing in CI pipeline to catch regressions early
+3. **Basic Testing Framework** [COMPLETED]
+   - Set up Jest or similar for unit testing core functionality [COMPLETED]
+   - Implement simple tests for critical functions [COMPLETED]
+   - Include testing in CI pipeline to catch regressions early [COMPLETED]
 
 4. **Improved Development Experience** [PARTIALLY COMPLETED]
    - Add hot-reloading for faster development cycles [COMPLETED]
