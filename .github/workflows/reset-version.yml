@@ -1,0 +1,152 @@
+name: Reset Version Numbering
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  reset-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Git
+        run: |
+          git config --global user.email "manual-action@noreply.github.com"
+          git config --global user.name "GitHub Action [Manual]"
+          
+      - name: Delete Tags 
+        run: |
+          # Delete all remote tags
+          git fetch
+          git tag -l | xargs -n 1 git push --delete origin || true
+          # Delete all local tags
+          git tag -l | xargs git tag -d || true
+          echo "Deleted all tags"
+          
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+          
+      - name: Reset package.json and commit
+        run: |
+          cat > package.json << 'EOF'
+          {
+            "name": "webcore-extension",
+            "version": "0.1.0",
+            "description": "A Chrome extension for WebCore",
+            "scripts": {
+              "clean": "rm -rf dist/*",
+              "build": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+              "build:watch": "npm run clean && tsc --watch & npm run copy:watch",
+              "copy:watch": "nodemon --watch src --ext html,css,json,png,svg,jpg --exec \"copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup\"",
+              "watch": "tsc --watch",
+              "test": "echo \"No tests specified yet\"",
+              "c": "node scripts/commit.js",
+              "prepare": "husky",
+              "sync-version": "node scripts/sync-version.js",
+              "semantic-release": "semantic-release",
+              "lint": "echo \"No linting configured yet\"",
+              "validate": "npm run lint && npm run test && npm run build",
+              "package": "npm run build && cd dist && zip -r ../extension.zip ."
+            },
+            "keywords": [
+              "chrome",
+              "extension",
+              "webcore"
+            ],
+            "author": "",
+            "license": "ISC",
+            "devDependencies": {
+              "@commitlint/cli": "^19.0.3",
+              "@commitlint/config-conventional": "^19.0.3",
+              "@semantic-release/changelog": "^6.0.3",
+              "@semantic-release/git": "^10.0.1",
+              "@semantic-release/github": "^11.0.1",
+              "@types/chrome": "^0.0.313",
+              "auto-changelog": "^2.5.0",
+              "copyfiles": "^2.4.1",
+              "husky": "^9.0.11",
+              "nodemon": "^3.1.9",
+              "semantic-release": "^24.2.3",
+              "typescript": "^5.8.3"
+            }
+          }
+          EOF
+          
+          node scripts/sync-version.js
+          
+          # Modify release config to ensure 0.1.0 is the starting point
+          cat > .releaserc.json << 'EOF'
+          {
+            "branches": ["main"],
+            "plugins": [
+              ["@semantic-release/commit-analyzer", {
+                "preset": "angular",
+                "releaseRules": [
+                  {"type": "feat", "release": "minor"},
+                  {"type": "fix", "release": "patch"},
+                  {"type": "docs", "release": "patch"},
+                  {"type": "style", "release": "patch"},
+                  {"type": "refactor", "release": "patch"},
+                  {"type": "perf", "release": "patch"},
+                  {"type": "test", "release": "patch"},
+                  {"type": "build", "release": "patch"},
+                  {"type": "ci", "release": "patch"},
+                  {"type": "chore", "release": "patch"}
+                ]
+              }],
+              "@semantic-release/release-notes-generator",
+              ["@semantic-release/changelog", {
+                "changelogFile": "CHANGELOG.md"
+              }],
+              ["@semantic-release/npm", {
+                "npmPublish": false
+              }],
+              ["@semantic-release/git", {
+                "assets": ["package.json", "src/manifest.json", "CHANGELOG.md"],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\\n\\n${nextRelease.notes}",
+                "gitUserName": "semantic-release-bot",
+                "gitUserEmail": "semantic-release-bot@users.noreply.github.com",
+                "commitOptions": ["--no-verify"]
+              }],
+              ["@semantic-release/github", {
+                "assets": [
+                  {"path": "extension.zip", "label": "Extension v${nextRelease.version}"}
+                ]
+              }]
+            ]
+          }
+          EOF
+          
+          # Reset CHANGELOG.md
+          cat > CHANGELOG.md << 'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file. This file is automatically updated by semantic-release.
+
+          ## Unreleased
+
+          Initial 0.1.0 release
+          EOF
+          
+          git add package.json src/manifest.json .releaserc.json CHANGELOG.md
+          git commit -m "chore: reset version to 0.1.0" --no-verify
+          git push --force origin main
+          
+      - name: Create Initial Tag
+        run: |
+          git tag -a v0.1.0 -m "Initial version 0.1.0"
+          git push origin v0.1.0 
