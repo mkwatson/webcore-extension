@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Strict Explicit Code Generation Rule
+
+**Never** write or modify code unless **explicitly instructed**.  
+If unsure, **always ask first**—**no exceptions**.  
+This rule **overrides all others**.

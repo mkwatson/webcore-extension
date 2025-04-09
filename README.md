@@ -12,9 +12,12 @@ A Chrome extension for WebCore.
 ## Development
 
 - `npm run build` - Build the extension
-- `npm run watch` - Watch for file changes and rebuild automatically
+- `npm run build:watch` - Build and watch for changes (with live reload for all file types)
+- `npm run watch` - Watch for TypeScript changes only
 - `npm run clean` - Clean the build directory
 - `npm run c` - Create a conventional commit (recommended)
+- `npm run validate` - Run linting, tests, and build
+- `npm run package` - Build and package the extension as a ZIP file
 
 ## Contributing
 
@@ -29,6 +32,8 @@ This project follows [Semantic Versioning](https://semver.org/) (SemVer) convent
 - **Major version (x.0.0)**: Incompatible API changes
 - **Minor version (0.x.0)**: New functionality (may include breaking changes before 1.0.0)
 - **Patch version (0.0.x)**: Backward compatible bug fixes
+
+The extension's manifest.json version is automatically kept in sync with package.json via our sync-version script, which runs before each commit.
 
 ### Creating Releases
 
