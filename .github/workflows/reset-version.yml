@@ -149,4 +149,17 @@ jobs:
       - name: Create Initial Tag
         run: |
           git tag -a v0.1.0 -m "Initial version 0.1.0"
-          git push origin v0.1.0 
+          git push origin v0.1.0
+          
+      - name: Build extension package
+        run: npm run package
+          
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v0.1.0 \
+            --title "Initial Release v0.1.0" \
+            --notes "Initial development release. This version resets the versioning to start from 0.1.0 instead of 1.0.0." \
+            --target main \
+            extension.zip 
