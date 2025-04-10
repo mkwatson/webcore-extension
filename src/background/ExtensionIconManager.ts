@@ -1,22 +1,43 @@
 /**
+ * Interface for the sidebar toggle event detail
+ */
+interface SidebarToggleEvent {
+  isActive: boolean;
+}
+
+/**
+ * Interface for icon paths
+ * Uses record syntax for compatibility with chrome.action.setIcon
+ */
+interface IconPaths extends Record<string, string> {
+  16: string;
+  32: string;
+  48: string;
+  128: string;
+}
+
+/**
  * Manages the extension's icon state and behavior
  */
 export class ExtensionIconManager extends EventTarget {
   private _isActive: boolean = false;
 
+  // Base path for icons
+  private readonly iconBasePath = '/icons';
+  
   // Icon paths
-  private readonly defaultIconPaths = {
-    16: '/icons/default-16.png',
-    32: '/icons/default-32.png',
-    48: '/icons/default-48.png',
-    128: '/icons/default-128.png',
+  private readonly defaultIconPaths: IconPaths = {
+    16: `${this.iconBasePath}/default-16.png`,
+    32: `${this.iconBasePath}/default-32.png`,
+    48: `${this.iconBasePath}/default-48.png`,
+    128: `${this.iconBasePath}/default-128.png`,
   };
 
-  private readonly activeIconPaths = {
-    16: '/icons/active-16.png',
-    32: '/icons/active-32.png',
-    48: '/icons/active-48.png',
-    128: '/icons/active-128.png',
+  private readonly activeIconPaths: IconPaths = {
+    16: `${this.iconBasePath}/active-16.png`,
+    32: `${this.iconBasePath}/active-32.png`,
+    48: `${this.iconBasePath}/active-48.png`,
+    128: `${this.iconBasePath}/active-128.png`,
   };
 
   constructor() {
@@ -36,23 +57,31 @@ export class ExtensionIconManager extends EventTarget {
    * Initialize the icon state
    */
   private initializeIcon(): void {
-    // Set initial icon state
-    chrome.action.setIcon({
-      path: this.defaultIconPaths,
-    });
+    try {
+      // Set initial icon state
+      chrome.action.setIcon({
+        path: this.defaultIconPaths,
+      });
 
-    // Set initial title
-    chrome.action.setTitle({
-      title: 'WebCore Extension (Inactive)',
-    });
+      // Set initial title
+      chrome.action.setTitle({
+        title: 'WebCore Extension (Inactive)',
+      });
+    } catch (error) {
+      console.error('Failed to initialize extension icon:', error);
+    }
   }
 
   /**
    * Set up event listeners
    */
   private setupEventListeners(): void {
-    // Listen for clicks on the extension icon
-    chrome.action.onClicked.addListener(this.handleIconClick.bind(this));
+    try {
+      // Listen for clicks on the extension icon
+      chrome.action.onClicked.addListener(this.handleIconClick.bind(this));
+    } catch (error) {
+      console.error('Failed to set up extension icon listeners:', error);
+    }
   }
 
   /**
@@ -95,25 +124,36 @@ export class ExtensionIconManager extends EventTarget {
    * Update the icon based on current state
    */
   private updateIcon(): void {
-    chrome.action.setIcon({
-      path: this._isActive ? this.activeIconPaths : this.defaultIconPaths,
-    });
+    try {
+      chrome.action.setIcon({
+        path: this._isActive ? this.activeIconPaths : this.defaultIconPaths,
+      });
+    } catch (error) {
+      console.error('Failed to update extension icon:', error);
+    }
   }
 
   /**
    * Update the title based on current state
    */
   private updateTitle(): void {
-    chrome.action.setTitle({
-      title: `WebCore Extension (${this._isActive ? 'Active' : 'Inactive'})`,
-    });
+    try {
+      chrome.action.setTitle({
+        title: `WebCore Extension (${this._isActive ? 'Active' : 'Inactive'})`,
+      });
+    } catch (error) {
+      console.error('Failed to update extension title:', error);
+    }
   }
 
   /**
    * Dispatch an event when the sidebar state changes
+   * 
+   * @fires sidebarToggle - Custom event containing the sidebar state
+   * Event detail: { isActive: boolean }
    */
   private dispatchSidebarToggleEvent(): void {
-    const event = new CustomEvent('sidebarToggle', {
+    const event = new CustomEvent<SidebarToggleEvent>('sidebarToggle', {
       detail: { isActive: this._isActive }
     });
     

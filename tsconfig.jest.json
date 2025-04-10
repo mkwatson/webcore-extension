@@ -3,7 +3,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",
-    "types": ["jest", "node", "chrome"]
+    "types": ["jest", "node", "chrome"],
+    "rootDir": "./"
   },
   "include": ["src/**/*", "tests/**/*"]
 } 
