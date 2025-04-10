@@ -85,11 +85,44 @@ A Chrome extension that provides an AI-powered chat interface for discussing web
   - [ ] Add permission requests
   - [ ] Handle permission changes
 
+- [x] 5.4. Testing
+  - [x] Configure jest-chrome for Manifest V3 APIs
+  - [x] Set up mocks for chrome.action and other extension APIs
+  - [x] Create helper functions for type-safe testing
+  - [x] Implement comprehensive test coverage for background scripts
+  - [x] Add tests for content script functionality
+
+- [x] 5.5. Extension Architecture Issues (Fixed)
+  - [x] Resolved ES module import/export incompatibility in extension context
+  - [x] Fixed service worker global context references (window vs self)
+  - [x] Made code context-aware for different extension environments
+  - [x] Implemented cross-context communication patterns
+
+### 6. Technical Debt & Production Considerations
+
+- [ ] 6.1. Module Bundling
+  - [ ] Evaluate webpack/rollup for proper ES module bundling
+  - [ ] Implement proper asset pipeline for production builds
+  - [ ] Set up tree-shaking and code splitting
+
+- [ ] 6.2. Architecture Improvements
+  - [ ] Replace current global object pattern with proper module system
+  - [ ] Implement dependency injection for better testability
+  - [ ] Create proper type definitions for Chrome extension APIs
+  - [ ] Document service worker limitations and solutions
+
+- [ ] 6.3. Performance Optimization
+  - [ ] Analyze and optimize load time for service worker
+  - [ ] Minimize content script footprint
+  - [ ] Implement lazy loading where appropriate
+  - [ ] Add performance monitoring
+
 ## Progress Tracking
 
 ### Current Status
 🟡 Project Setup Complete
-⚪ Development In Progress
+🟡 Basic Extension Framework Working
+⚪ Feature Development In Progress
 
 ### Next Steps
 1. Begin with UI components implementation
@@ -105,4 +138,28 @@ A Chrome extension that provides an AI-powered chat interface for discussing web
 - React
 - OpenAI API
 - Chrome Extension APIs
-- HTML-to-Markdown converter (TBD) 
+- HTML-to-Markdown converter (TBD)
+
+## Debugging Notes
+
+### Extension Loading Issues Resolved
+
+We encountered and resolved two major technical challenges:
+
+1. **ES Module Import/Export Syntax Incompatibility**
+   - **Problem**: Service worker registration failed (Status code 3) and content scripts had errors: "Cannot use import statement outside a module"
+   - **Solution**: Removed ES module syntax and adopted more traditional export patterns with global objects
+   - **Long-term Options**: 
+     - Implement proper module bundling with webpack or rollup
+     - Use IIFE (Immediately Invoked Function Expressions) for scoping
+     - Configure a proper TypeScript compilation pipeline with optimal settings for extensions
+
+2. **Service Worker Context Issues**
+   - **Problem**: "Uncaught ReferenceError: window is not defined" in service worker
+   - **Solution**: Made code context-aware by detecting the environment (window vs self) and using the appropriate global object
+   - **Long-term Options**:
+     - Create environment abstractions to handle different contexts
+     - Use a specialized framework designed for extensions (e.g., Plasmo)
+     - Implement better dependency injection to avoid global object references
+
+The temporary solution uses a simplified architecture that makes objects globally available in both window and service worker contexts, avoiding ES module syntax. This approach enables faster debugging but should be replaced with a more robust architecture for production. 

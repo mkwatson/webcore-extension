@@ -1,3 +1,7 @@
+// Properly typed chrome API mock object for tests
+const addListenerMock = jest.fn();
+const removeListenerMock = jest.fn();
+
 export const chrome = {
   runtime: {
     sendMessage: jest.fn(),
@@ -38,7 +42,28 @@ export const chrome = {
   }
 };
 
-// Using a more flexible approach to avoid TypeScript errors with the chrome namespace
+// Set up proper mock implementation functions
+(chrome.tabs.query as jest.Mock).mockImplementation = jest.fn();
+(chrome.storage.local.get as jest.Mock).mockImplementation = jest.fn();
+(chrome.storage.local.set as jest.Mock).mockImplementation = jest.fn();
+
+// Using a proper type-safe approach to patch document.addEventListener
+if (typeof document !== 'undefined') {
+  // Save the original
+  const originalAddEventListener = document.addEventListener;
+  
+  // Create a mock function with proper typing
+  const mockAddEventListener = jest.fn<void, [string, EventListenerOrEventListenerObject, (boolean | AddEventListenerOptions)?]>(
+    (type, listener, options) => {
+      return originalAddEventListener.call(document, type, listener, options);
+    }
+  );
+  
+  // Replace the original
+  document.addEventListener = mockAddEventListener;
+}
+
+// Make chrome available globally
 Object.defineProperty(global, 'chrome', {
   value: chrome
 }); 

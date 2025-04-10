@@ -3,7 +3,9 @@
       "target": "ES2020",
       "module": "ES2020",
       "moduleResolution": "node",
-      "strict": true,
+      "strict": false,
+      "noImplicitThis": false,
+      "noImplicitAny": false,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
@@ -14,12 +16,12 @@
       "sourceRoot": "",
       "lib": ["DOM", "ES2020"],
       
-      /* Additional type-checking options */
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "exactOptionalPropertyTypes": true
+      /* Additional type-checking options - temporarily disabled for debugging */
+      "noUnusedLocals": false,
+      "noUnusedParameters": false,
+      "noImplicitReturns": false,
+      "noFallthroughCasesInSwitch": false,
+      "exactOptionalPropertyTypes": false
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]

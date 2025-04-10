@@ -1,4 +1,5 @@
-import '../../tests/mocks/chrome';
+import { chrome } from 'jest-chrome';
+import { createTabsQueryMock, createTabsSendMessageMock } from '../mocks/custom-mocks';
 
 // Mock the ExtensionIconManager
 jest.mock('../../src/background/ExtensionIconManager', () => {
@@ -38,11 +39,17 @@ describe('Background Script', () => {
   });
 
   test('sets up onInstalled listener on load', () => {
+    // Create a spy on the addListener method
+    const addListenerSpy = jest.spyOn(chrome.runtime.onInstalled, 'addListener');
+    
     // Import to register listeners
     require('../../src/background/background');
     
     // Verify the listener was registered
-    expect(chrome.runtime.onInstalled.addListener).toHaveBeenCalled();
+    expect(addListenerSpy).toHaveBeenCalled();
+    
+    // Clean up spy
+    addListenerSpy.mockRestore();
   });
 
   test('handles sidebar toggle events', () => {
@@ -71,6 +78,40 @@ describe('Background Script', () => {
     
     expect(console.warn).toHaveBeenCalledWith(
       expect.stringContaining('inactive')
+    );
+  });
+
+  test('logs sidebar state changes', () => {
+    // Import to register listeners
+    const backgroundModule = require('../../src/background/background');
+    
+    // Create a mock sidebar toggle event for active state
+    const toggleEvent = new CustomEvent('sidebarToggle', {
+      detail: { isActive: true }
+    });
+    
+    // Dispatch the event on the icon manager
+    backgroundModule.iconManager.dispatchEvent(toggleEvent);
+    
+    // Verify that console.warn was called with the appropriate message
+    expect(console.warn).toHaveBeenCalledWith(
+      'Sidebar state changed: active'
+    );
+    
+    // Test with inactive state
+    const inactiveEvent = new CustomEvent('sidebarToggle', {
+      detail: { isActive: false }
+    });
+    
+    // Clear previous calls
+    jest.clearAllMocks();
+    
+    // Dispatch the event
+    backgroundModule.iconManager.dispatchEvent(inactiveEvent);
+    
+    // Verify the inactive message was logged
+    expect(console.warn).toHaveBeenCalledWith(
+      'Sidebar state changed: inactive'
     );
   });
 }); 
