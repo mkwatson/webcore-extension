@@ -1,47 +1,76 @@
 import '../../tests/mocks/chrome';
 
+// Mock the ExtensionIconManager
+jest.mock('../../src/background/ExtensionIconManager', () => {
+  // Create a mock class that extends EventTarget
+  return {
+    ExtensionIconManager: jest.fn().mockImplementation(() => {
+      const eventTarget = new EventTarget();
+      return {
+        isActive: false,
+        addEventListener: eventTarget.addEventListener.bind(eventTarget),
+        dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
+        toggle: jest.fn(),
+        setActive: jest.fn()
+      };
+    })
+  };
+});
+
 describe('Background Script', () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
     
     // Reset console mocks
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
     
     // Clear module cache to ensure fresh import each time
     jest.resetModules();
   });
 
-  test('sets up message listener on load', () => {
-    // Manually import the script to test the listener registration
-    require('../../src/background/background');
+  test('initializes ExtensionIconManager on load', () => {
+    // Import to create the manager
+    const backgroundModule = require('../../src/background/background');
     
-    // Verify the listener was registered
-    expect(chrome.runtime.onMessage.addListener).toHaveBeenCalled();
+    // Verify the manager was initialized
+    expect(backgroundModule.iconManager).toBeDefined();
   });
 
   test('sets up onInstalled listener on load', () => {
-    // Manually import the script to test the listener registration
+    // Import to register listeners
     require('../../src/background/background');
     
     // Verify the listener was registered
     expect(chrome.runtime.onInstalled.addListener).toHaveBeenCalled();
   });
 
-  test('responds to messages with a received status', () => {
+  test('handles sidebar toggle events', () => {
     // Import to register listeners
-    require('../../src/background/background');
+    const backgroundModule = require('../../src/background/background');
     
-    // Create a mock message handler by simulating what happens when a message is received
-    const mockSendResponse = jest.fn();
+    // Create a mock sidebar toggle event
+    const toggleEvent = new CustomEvent('sidebarToggle', {
+      detail: { isActive: true }
+    });
     
-    // Find the callback function (first argument to addListener)
-    const onMessageCallback = (chrome.runtime.onMessage.addListener as jest.Mock).mock.calls[0][0];
+    // Dispatch the event on the icon manager
+    backgroundModule.iconManager.dispatchEvent(toggleEvent);
     
-    // Call it with a test message
-    onMessageCallback({ type: 'test' }, { id: 'test-sender' }, mockSendResponse);
+    // Verify that the console.warn was called with the appropriate message
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining('active')
+    );
     
-    // Verify the response
-    expect(mockSendResponse).toHaveBeenCalledWith({ status: 'received' });
+    // Test with inactive state
+    const inactiveEvent = new CustomEvent('sidebarToggle', {
+      detail: { isActive: false }
+    });
+    
+    backgroundModule.iconManager.dispatchEvent(inactiveEvent);
+    
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining('inactive')
+    );
   });
 }); 
