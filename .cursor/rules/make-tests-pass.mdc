@@ -1,0 +1,20 @@
+---
+description: Any task with explicitly defined tests awaiting implementation
+globs: 
+alwaysApply: false
+---
+### 🟢 **Make Tests Pass Rule**
+
+After writing initial failing tests for any task with explicitly confirmed requirements:
+
+1. **Minimal Implementation:**  
+   _Write only enough code to pass your current failing tests._
+
+2. **Incremental Focus:**  
+   _Implement the simplest solution first; defer additional complexity._
+
+3. **Strict Test Alignment:**  
+   _Ensure code aligns exactly with test-defined behavior and requirements._
+
+4. **Maintain Consistency:**  
+   _Adhere to existing project patterns and coding standards ([eslint.config.js](mdc:eslint.config.js), [tsconfig.jest.json](mdc:tsconfig.jest.json))._

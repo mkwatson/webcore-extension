@@ -6,6 +6,7 @@ module.exports = {
       tsconfig: 'tsconfig.jest.json',
     }],
   },
+  setupFilesAfterEnv: ['./jest.setup.js'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   collectCoverageFrom: [

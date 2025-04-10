@@ -1,0 +1,17 @@
+---
+description: Any clearly scoped task likely ready for implementation
+globs: 
+alwaysApply: false
+---
+### 🎯 **Explicit Task Definition Rule**
+
+For each clearly scoped task, explicitly confirm the requirements before coding.
+
+1. **Restate & Confirm Requirements:**  
+   _Explicitly restate the task to confirm accurate understanding._
+
+2. **Clarify Ambiguities & Assumptions:**  
+   _Clearly list uncertainties and explicitly ask clarifying questions._
+
+3. **Identify Context & Edge Cases:**  
+   _Mention relevant existing code, patterns, or documentation, and highlight any unusual scenarios or inputs._
