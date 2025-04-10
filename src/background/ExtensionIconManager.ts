@@ -87,7 +87,7 @@ export class ExtensionIconManager extends EventTarget {
   /**
    * Handle clicks on the extension icon
    */
-  private handleIconClick(_tab: chrome.tabs.Tab): void {
+  private handleIconClick(): void {
     this.toggle();
   }
 

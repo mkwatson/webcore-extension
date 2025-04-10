@@ -5,11 +5,11 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "npm run build:dev",
-    "build:dev": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup",
+    "build:dev": "npm run clean && tsc && copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup && copyfiles -u 2 src/icons/* dist/icons",
     "build:prod": "npm run build:dev && npm run remove-sourcemaps",
     "remove-sourcemaps": "find dist -name '*.map' -delete",
     "build:watch": "npm run clean && tsc --watch & npm run copy:watch",
-    "copy:watch": "nodemon --watch src --ext html,css,json,png,svg,jpg --exec \"copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup\"",
+    "copy:watch": "nodemon --watch src --ext html,css,json,png,svg,jpg --exec \"copyfiles -u 1 src/manifest.json dist && copyfiles -u 2 src/popup/* dist/popup && copyfiles -u 2 src/icons/* dist/icons\"",
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
