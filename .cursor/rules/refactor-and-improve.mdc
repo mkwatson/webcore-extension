@@ -1,0 +1,23 @@
+---
+description: After passing tests
+globs: 
+alwaysApply: false
+---
+### 🧹 **Refactor and Improve Rule**
+
+After passing tests for any task with explicitly confirmed requirements:
+
+1. **Simplify for Clarity:**
+   _Refactor code to maximize readability and clearly communicate intent._
+
+2. **Eliminate Duplication:**
+   _Combine or abstract repeated code into reusable functions or modules._
+
+3. **Enhance Maintainability:**
+   _Align code structure with project patterns and standards ([eslint.config.js](mdc:eslint.config.js), [tsconfig.jest.json](mdc:tsconfig.jest.json)). Run the linter and type checker and fix all errors and warnings._
+
+4. **Avoid Behavior Changes:**
+   _Ensure existing tests remain green to verify no behavior regressions occur during refactoring._
+
+5. **Verify Continuous Alignment:**
+   _Regularly confirm refactored code matches original requirements._

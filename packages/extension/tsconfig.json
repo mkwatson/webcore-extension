@@ -1,0 +1,14 @@
+{
+  "include": ["src", ".plasmo/index.d.ts"],
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "~*": ["./src/*"]
+    },
+    "jsx": "react-jsx",
+    "composite": true,
+    "declarationDir": "dist",
+    "outDir": "dist"
+  },
+  "references": [{ "path": "../shared" }]
+}

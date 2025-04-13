@@ -1,0 +1,20 @@
+---
+description: Any task possibly improved by further subdivision
+globs: 
+alwaysApply: false
+---
+### 🗂️ **Task Breakdown Rule**
+
+Upon receiving an unclear or complex task, explicitly break it into manageable subtasks before defining detailed requirements.
+
+1. **List Subtasks Explicitly:**  
+   _Clearly separate the main task into actionable subtasks._
+
+2. **Define Scope & Boundaries:**  
+   _Explicitly state what's included and what's excluded._
+
+3. **Identify Dependencies:**  
+   _Highlight dependencies between subtasks and existing components._
+
+4. **Confirm Task Granularity:**  
+   _Ensure each subtask is implementation-ready and sufficiently small._

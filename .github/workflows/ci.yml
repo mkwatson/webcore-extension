@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # Use v4
+      - uses: pnpm/action-setup@v4 # Use v4
+        with:
+          version: latest # Or pin a specific version
+      - name: Use Node.js
+        uses: actions/setup-node@v4 # Use v4
+        with:
+          node-version: '18' # Or your preferred LTS
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm -r lint # Assumes lint script in each package
+
+      - name: Type Check
+        run: pnpm typecheck # Assumes root typecheck script
+
+      - name: Test
+        run: pnpm test --ci --coverage # Assumes root test script
+
+      - name: Build Shared & Extension
+        run: pnpm --filter=@webcore/shared --filter=@webcore/extension build
+      
+      # Backend build often handled by Vercel, skip here unless needed
+      # - name: Build Backend
+      #   run: pnpm --filter=@webcore/backend build 

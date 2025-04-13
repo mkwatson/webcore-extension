@@ -1,0 +1,48 @@
+{
+  "name": "extension",
+  "displayName": "Extension",
+  "version": "0.0.1",
+  "description": "The AI browser companion",
+  "author": "Mark Watson <mark@webcore.dev>",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@webcore/shared": "workspace:^",
+    "firebase": "^11.6.0",
+    "plasmo": "0.90.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@types/chrome": "0.0.258",
+    "@types/node": "20.11.5",
+    "@types/react": "18.2.48",
+    "@types/react-dom": "18.2.18",
+    "prettier": "3.2.4",
+    "typescript": "5.3.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ],
+    "permissions": [
+      "tabs",
+      "identity"
+    ],
+    "oauth2": {
+      "client_id": "142098427179-rmg59315cs95mj8bh1v8o6qt3t2tud2r.apps.googleusercontent.com",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  // This file is primarily for running `tsc --build` from the root.
+  // It doesn't need compilerOptions as they are inherited from referenced projects.
+  "files": [], // No actual files compiled at the root
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/extension" },
+    { "path": "./packages/backend" }
+  ]
+}

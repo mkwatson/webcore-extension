@@ -1,0 +1,29 @@
+---
+description: Any task with explicitly confirmed requirements
+globs: 
+alwaysApply: false
+---
+### 🧪 **Write Tests First Rule**
+
+For any clearly scoped task with explicitly confirmed requirements, strictly follow these steps:
+
+1. **Restate Expected Behavior:**  
+   _Explicitly restate the exact behavior your tests will verify._
+
+2. **Review Existing Tests & Standards:**  
+   _Examine existing tests to avoid redundancy and ensure consistency with project patterns._
+
+3. **Identify Helpful Documentation:**  
+_Explicitly name relevant documentation you think may assist. Request this documentation if unavailable._
+
+4. **Define Focused Test Cases:**  
+   _Clearly list test cases covering typical scenarios, edge cases, and error conditions. Avoid tests that don't drive new behaviors or meaningful implementation._
+
+5. **Write Minimal Tests:**  
+   _Create concise, behavior-focused tests without assuming implementation details._
+
+6. **Verify Alignment:**  
+   _Confirm tests precisely match stated requirements and relevant context._
+
+7. **Follow Project Standards:**  
+   _Ensure compliance with @jest.config.js, @eslint.config.js, @tsconfig.json, and @tsconfig.jest.json._

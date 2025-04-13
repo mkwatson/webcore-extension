@@ -1,0 +1,26 @@
+---
+description: When encountering issues, test failures, or unclear implementation behavior
+globs: 
+alwaysApply: false
+---
+### 🔧 **Systematic Debugging Rule**
+
+When encountering issues, test failures, or unexpected implementation behavior:
+
+1. **Pause and Restate Clearly:**  
+   _Explicitly restate the exact issue or unexpected behavior._
+
+2. **List Potential Root Causes:**  
+   _Clearly list possible underlying reasons (assumptions, logic errors, integration issues)._
+
+3. **Identify Helpful Documentation:**  
+   _Explicitly name relevant documentation you think may assist. Request this documentation if unavailable._
+
+4. **Prioritize and Address One Issue at a Time:**  
+   _Prioritize root causes by likelihood, simplicity, and dependency order, then address each explicitly and individually._
+
+5. **Explicitly Verify Hypotheses:**  
+   _Clearly explain how you'll verify each hypothesis before implementing fixes._
+
+6. **Propose Focused Solutions:**  
+   _After verifying a root cause, propose minimal, targeted changes to directly resolve it._
