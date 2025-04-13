@@ -20,18 +20,19 @@ jest.mock('@mozilla/readability', () => ({
   })),
 }));
 
-// Mock global document - basic structure
+// Mock global document - providing a partial type to avoid 'any'
 global.document = {
-  cloneNode: jest.fn(() => global.document), // Simple mock, might need refinement
+  cloneNode: jest.fn(() => global.document),
   title: 'Original Document Title',
-  // Add other document properties if needed by Readability mock
-} as any;
+  // We only mock the parts used by the function under test
+} as unknown as Document; // Use 'as unknown as Document' for stricter type casting
 
+// Mock global window - providing a partial type
 global.window = {
   location: {
     href: 'http://example.com/test'
   }
-} as any;
+} as unknown as Window & typeof globalThis; // Use 'as unknown as Window...' for stricter type casting
 
 beforeEach(() => {
   // Reset mocks before each test
