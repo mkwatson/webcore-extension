@@ -277,11 +277,12 @@ This action-oriented checklist replaces traditional milestones with clear, execu
   - 🎯 Est. effort: 1-2 days
   - 🚨 Risk level: High
 
-- [ ] **Content Extraction POC**
+- [ ] **Content Extraction POC** (Implementation Complete)
 
-  - ✓ When complete: Readable content extracted from 80%+ of test sites
+  - ✓ Implementation Complete: Mechanism built (content script, Readability, Turndown, messaging).
+  - ☐ Validation Pending: Requires testing across 80%+ of diverse test sites.
   - 🎯 Est. effort: 2-3 days
-  - 🚨 Risk level: High
+  - 🚨 Risk level: Low
 
 - [x] **Sidebar UI POC**
   - ✓ When complete: Sidebar shifts page content without breaking layouts
@@ -302,14 +303,14 @@ This action-oriented checklist replaces traditional milestones with clear, execu
   - 🎯 Est. effort: 1 day
   - 🚨 Risk level: Low
 
-- [ ] **Extension Scaffold**
+- [X] **Extension Scaffold**
   - ✓ When complete: Basic Plasmo extension loads in Chrome
   - 🎯 Est. effort: 0.5 day
   - 🚨 Risk level: Low
 
 ### 3️⃣ Core Functionality
 
-- [ ] **Authentication Implementation**
+- [X] **Authentication Implementation**
 
   - ✓ When complete: Users can sign in/out with Google
   - 🎯 Est. effort: 2-3 days
