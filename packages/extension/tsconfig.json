@@ -9,6 +9,5 @@
     "composite": true,
     "declarationDir": "dist",
     "outDir": "dist"
-  },
-  "references": [{ "path": "../shared" }]
+  }
 }
