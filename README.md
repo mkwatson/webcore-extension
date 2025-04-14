@@ -60,3 +60,37 @@ The initial Minimum Viable Product (MVP) aims to deliver:
 ## Next Steps
 
 Based on the project requirements, the next critical validation step is the **Content Extraction POC**.
+
+## Development Notes
+
+### TypeScript Monorepo Setup (PNPM Workspaces)
+
+This project uses PNPM workspaces and TypeScript project references/paths for code sharing between packages (e.g., `@webcore/extension`, `@webcore/shared`, `@webcore/backend`).
+
+**Important:** During development, we found that standard TypeScript Project References (`references` field in `tsconfig.json`) were **not reliably resolved** by the build/check process within the Plasmo/Parcel environment for the `extension` package.
+
+The **working configuration** uses explicit **Path Aliases** (`paths` field in `packages/extension/tsconfig.json`) to import from other workspace packages like `@webcore/shared`:
+
+```json
+// packages/extension/tsconfig.json
+{
+  // ...
+  "compilerOptions": {
+    "baseUrl": ".", // Usually inherited from base
+    "paths": {
+      "~/*": ["./src/*"],
+      // This alias maps imports like `@webcore/shared/...`
+      // to the correct source directory relative to the root baseUrl.
+      "@webcore/shared/*": ["packages/shared/src/*"]
+    }
+    // ...
+  }
+  // Note: Project references field was removed as paths are used instead
+}
+```
+
+**Troubleshooting Tips:**
+
+- Ensure the referenced package (`packages/shared`) is built (`pnpm --filter shared build`) as it generates necessary type definitions.
+- Clear the Parcel cache (`rm -rf .parcel-cache`) if you encounter persistent resolution issues after configuration changes.
+- Verify the `package.json` (`name`, `types`, `source`, `files` fields) and `src/index.ts` (re-exporting types) in the shared package are correctly configured.

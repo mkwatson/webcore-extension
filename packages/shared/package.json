@@ -2,8 +2,13 @@
   "name": "@webcore/shared",
   "version": "0.0.1",
   "private": true,
+  "source": "src/index.ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint . --ext .ts --fix",
