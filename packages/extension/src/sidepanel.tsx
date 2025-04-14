@@ -1,13 +1,14 @@
+// Import types using package name (enabled by TS project references)
+import type {
+  ExtractedContent,
+  GetContentRequest,
+  GetContentResponse
+} from "@webcore/shared/messaging-types"
 import { useState } from "react" // Add useState import
 
 import { useFirebase } from "./firebase/hook" // Import the hook
 
-// Import types from within the extension package
-import type {
-  ExtractedContent,
-  GetContentRequest,
-  GetContentResponse,
-} from "./types/messaging-types"
+// Assuming package name is @webcore/shared
 
 // Optional: Import basic styling if needed
 // import './style.css'
@@ -18,7 +19,8 @@ function IndexSidePanel() {
   const { user, isLoading, error, onLogin, onLogout } = useFirebase()
   const [inputValue, setInputValue] = useState("") // State for the chat input
   // State for content extraction results
-  const [extractedContent, setExtractedContent] = useState<ExtractedContent | null>(null)
+  const [extractedContent, setExtractedContent] =
+    useState<ExtractedContent | null>(null)
   const [extractionError, setExtractionError] = useState<string | null>(null)
   const [isExtracting, setIsExtracting] = useState(false)
 
@@ -35,7 +37,7 @@ function IndexSidePanel() {
     try {
       const [tab] = await chrome.tabs.query({
         active: true,
-        currentWindow: true,
+        currentWindow: true
       })
 
       if (!tab || !tab.id) {
@@ -43,7 +45,11 @@ function IndexSidePanel() {
       }
 
       const request: GetContentRequest = { type: "GET_CONTENT_REQUEST" }
-      console.log("[WebCore SidePanel] Sending request to tab:", tab.id, request)
+      console.log(
+        "[WebCore SidePanel] Sending request to tab:",
+        tab.id,
+        request
+      )
 
       // Send message to the content script in the specific tab
       const response: GetContentResponse = await chrome.tabs.sendMessage(
@@ -59,14 +65,20 @@ function IndexSidePanel() {
         } else if (response.error) {
           setExtractionError(response.error)
         } else {
-          setExtractionError("Received unexpected empty response from content script.")
+          setExtractionError(
+            "Received unexpected empty response from content script."
+          )
         }
       } else {
-        setExtractionError("Received unexpected message type from content script.")
+        setExtractionError(
+          "Received unexpected message type from content script."
+        )
       }
     } catch (err) {
       console.error("[WebCore SidePanel] Error getting content:", err)
-      setExtractionError(err instanceof Error ? err.message : "An unknown error occurred.")
+      setExtractionError(
+        err instanceof Error ? err.message : "An unknown error occurred."
+      )
     } finally {
       setIsExtracting(false)
     }
@@ -102,27 +114,44 @@ function IndexSidePanel() {
           Sign In with Google
         </button>
       )}
-
       {/* Content Extraction Section */}
-      <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '10px' }}>
+      <div
+        style={{
+          marginTop: "20px",
+          borderTop: "1px solid #eee",
+          paddingTop: "10px"
+        }}>
         <button onClick={handleGetContent} disabled={isExtracting}>
           {isExtracting ? "Extracting..." : "Get Page Content"}
         </button>
         {extractionError && (
-          <p style={{ color: "red", marginTop: "10px" }}>Error: {extractionError}</p>
+          <p style={{ color: "red", marginTop: "10px" }}>
+            Error: {extractionError}
+          </p>
         )}
         {extractedContent && (
-          <div style={{ marginTop: "10px", maxHeight: "300px", overflowY: "auto", background: "#f9f9f9", border: "1px solid #ddd", padding: "5px" }}>
+          <div
+            style={{
+              marginTop: "10px",
+              maxHeight: "300px",
+              overflowY: "auto",
+              background: "#f9f9f9",
+              border: "1px solid #ddd",
+              padding: "5px"
+            }}>
             <h4>Extracted Content:</h4>
-            <p><strong>Title:</strong> {extractedContent.title}</p>
-            <p><strong>URL:</strong> {extractedContent.url}</p>
+            <p>
+              <strong>Title:</strong> {extractedContent.title}
+            </p>
+            <p>
+              <strong>URL:</strong> {extractedContent.url}
+            </p>
             <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
               {extractedContent.markdownContent}
             </pre>
           </div>
         )}
       </div>
-
       {/* Placeholder for future chat elements */}
       <div
         style={{

@@ -3,11 +3,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "~*": ["./src/*"]
+      "~*": ["./src/*"],
+      // Use explicit paths for shared packages. Project References resolution
+      // was unreliable in the Plasmo/Parcel build environment.
+      // Ensure referenced package is built (`pnpm --filter @webcore/shared build`)
+      // and clear Parcel cache (`rm -rf .parcel-cache`) if issues arise.
+      "@webcore/shared/*": ["packages/shared/src/*"]
     },
     "jsx": "react-jsx",
     "composite": true,
     "declarationDir": "dist",
     "outDir": "dist"
-  }
+  },
+  "references": [{ "path": "../shared" }]
 }
