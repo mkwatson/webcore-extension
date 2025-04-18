@@ -5,16 +5,26 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "echo 'Backend dev TBD (e.g., vercel dev)'",
+    "prebuild": "pnpm --filter @webcore/shared build",
     "build": "tsc -p .",
+    "test": "vitest run",
     "lint": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@vercel/node": "^5.1.14"
+    "@types/node": "20.11.5",
+    "@vercel/node": "^5.1.14",
+    "aws-sdk-client-mock": "^4.1.0",
+    "vercel": "^41.6.0",
+    "vitest": "^3.1.1"
   },
   "dependencies": {
-    "@webcore/shared": "workspace:^"
+    "@ai-sdk/openai": "^1.3.12",
+    "@aws-sdk/client-bedrock-runtime": "^3.787.0",
+    "@aws-sdk/credential-providers": "^3.787.0",
+    "@webcore/shared": "workspace:^",
+    "ai": "^4.3.6",
+    "openai": "^4.94.0"
   }
 }

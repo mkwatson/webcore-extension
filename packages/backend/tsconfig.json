@@ -1,12 +1,16 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node (Backend)",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./api", // Assuming functions live in api/
-    "module": "CommonJS", // Vercel serverless often uses CommonJS
-    "composite": true
+    "paths": {
+      "@webcore/shared/*": ["packages/shared/src/*"]
+    },
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["node"]
   },
-  "include": ["api/**/*.ts"],
+  "include": ["./**/*"],
   "exclude": ["node_modules", "dist"],
   "references": [{ "path": "../shared" }]
 } 
