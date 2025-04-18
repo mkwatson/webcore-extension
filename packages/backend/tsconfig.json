@@ -3,14 +3,15 @@
   "display": "Node (Backend)",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "@webcore/shared/*": ["packages/shared/src/*"]
+      "@webcore/shared/*": ["../shared/src/*"]
     },
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDirs": [".", "../shared/src"],
     "types": ["node"]
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist"],
   "references": [{ "path": "../shared" }]
-} 
+}

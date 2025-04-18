@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { mockClient } from 'aws-sdk-client-mock';
 import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
-import type { ChatMessage } from "@webcore/shared/messaging-types";
+import type { ChatMessage } from "@webcore/shared/types/messaging";
 import handler from './chat';
 
 // Mock the Bedrock client
@@ -185,7 +185,7 @@ describe('API Handler: /api/chat', () => {
             // Type check for unknown
             expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
             if (typeof body === 'object' && body !== null && 'error' in body) {
-                expect((body as { error: string }).error).toBe('Invalid request body: messages array is required.');
+                expect((body as { error: string }).error).toBe('Invalid request body: JSON parsing failed.');
             }
          });
          

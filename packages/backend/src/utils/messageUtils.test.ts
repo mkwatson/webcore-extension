@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
+import type { ChatMessage } from "@webcore/shared/types/messaging"
 import { truncateMessages, estimateTokenCount } from './messageUtils'
-import type { ChatMessage } from "@webcore/shared/messaging-types"
 
 // Mock console.warn to prevent excessive test output
 vi.spyOn(console, 'warn').mockImplementation(() => {});

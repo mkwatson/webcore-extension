@@ -2,14 +2,23 @@
   "name": "webcore-monorepo",
   "version": "0.0.1",
   "private": true,
+  "packageManager": "pnpm@10.8.0",
   "scripts": {
     "prepare": "husky install",
-    "test": "jest --passWithNoTests",
-    "lint": "pnpm -r lint",
-    "typecheck": "tsc --build --force",
-    "build": "pnpm -r build"
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "build": "turbo build",
+    "postbuild": "node tools/fix-d-ts-imports.js",
+    "dev": "turbo dev",
+    "dev:all": "concurrently \"pnpm --filter extension dev\" \"pnpm --filter @webcore/backend dev:all\" --names extension,backend --kill-others --success first",
+    "predeploy": "pnpm --filter @webcore/backend bundle && pnpm --filter @webcore/backend test:runtime",
+    "validate:imports": "node tools/validate-imports.js",
+    "find:imports": "node tools/find-cross-package-imports.js",
+    "verify:turbo": "node tools/verify-turborepo.js"
   },
   "devDependencies": {
+    "concurrently": "^7.6.0",
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -18,6 +27,8 @@
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
+    "eslint-import-resolver-typescript": "^4.3.2",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
@@ -27,6 +38,7 @@
     "msw": "^2.7.4",
     "prettier": "^3.5.3",
     "ts-jest": "^29.3.1",
+    "turbo": "^2.5.0",
     "typescript": "^5.8.3"
   }
 }

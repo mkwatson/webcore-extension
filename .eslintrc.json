@@ -1,27 +1,4 @@
 {
   "root": true,
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier" // Must be last
-  ],
-  "rules": {
-    "react/react-in-jsx-scope": "off"
-  },
-  "settings": {
-    "react": {
-      "version": "detect",
-      "jsxRuntime": "automatic"
-    }
-  },
-  "env": {
-    "browser": true,
-    "node": true,
-    "es2021": true
-  },
-  "ignorePatterns": ["node_modules", "dist", "build", ".plasmo", "examples"]
+  "extends": "./eslintrc.base.js"
 }

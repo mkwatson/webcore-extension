@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@webcore/shared/messaging-types";
+import type { ChatMessage } from "@webcore/shared/types/messaging";
 
 const CHARS_PER_TOKEN = 4; // Rough estimate, may need adjustment for Claude
 

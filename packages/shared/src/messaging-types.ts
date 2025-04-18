@@ -21,3 +21,14 @@ export type ContentScriptRequest = GetContentRequest // Add others later if need
 
 // Union type for messages sent FROM the content script (responses)
 export type ContentScriptResponse = GetContentResponse // Add others later if needed
+
+// Chat Message Type
+export interface ChatMessage {
+  role: "user" | "assistant" | "system"
+  content: string
+  // Optional timestamp or message ID could be added later
+}
+
+// This file is maintained for backward compatibility.
+// New code should import from '@webcore/shared/types/messaging'
+export * from './types/messaging';

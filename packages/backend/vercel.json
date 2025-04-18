@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/*.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["../shared/dist/**/*"],
+        "maxDuration": 10
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat.ts"
+    },
+    {
+      "src": "/api/hello",
+      "dest": "/api/hello.ts"
+    },
+    {
+      "src": "/api/test-imports",
+      "dest": "/api/test-imports.ts"
+    }
+  ]
+}

@@ -1,10 +1,8 @@
 // Import types using package name (enabled by TS project references)
 import type {
   ChatMessage,
-  ExtractedContent,
-  // GetContentRequest, // Remove unused import
-  GetContentResponse
-} from "@webcore/shared/messaging-types"
+  ExtractedContent
+} from "@webcore/shared/types/messaging"
 import { useEffect, useRef, useState } from "react" // Add useState, useEffect, and useRef imports
 import { sendToBackground } from "@plasmohq/messaging" // Import Plasmo messaging
 
@@ -23,7 +21,7 @@ interface ChatMessageWithId extends ChatMessage {
 
 // Constant for the summary prompt
 const SUMMARIZE_PROMPT_TEMPLATE =
-  "Please provide a concise summary of the content I've shared, clearly highlighting the main points and key takeaways in one short paragraph."
+  "Please provide a concise summary of the content, clearly highlighting the main points and key takeaways in one short paragraph."
 
 // System prompt constant
 const SYSTEM_PROMPT = `[System role instructions]
@@ -65,7 +63,7 @@ function IndexSidePanel() {
       console.log("[WebCore SidePanel] Sending getContent message to background")
 
       // Rely on type inference, provide correct body
-      const response: GetContentResponse = await sendToBackground({
+      const response = await sendToBackground({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - Re-suppress persistent lint error for name
         name: "getContent",
@@ -73,6 +71,12 @@ function IndexSidePanel() {
       })
 
       console.log("[WebCore SidePanel] Received response from background:", response)
+
+      // Check if response is undefined first
+      if (!response) {
+        setExtractionError("No response received from background script.")
+        return
+      }
 
       // Process the response (already in GetContentResponse format)
       if (response.payload) {

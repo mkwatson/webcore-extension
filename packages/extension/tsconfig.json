@@ -8,7 +8,7 @@
       // was unreliable in the Plasmo/Parcel build environment.
       // Ensure referenced package is built (`pnpm --filter @webcore/shared build`)
       // and clear Parcel cache (`rm -rf .parcel-cache`) if issues arise.
-      "@webcore/shared/*": ["packages/shared/src/*"]
+      "@webcore/shared/*": ["../shared/src/*"]
     },
     "jsx": "react-jsx",
     "composite": true,

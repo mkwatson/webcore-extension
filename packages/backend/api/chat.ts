@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@webcore/shared/messaging-types";
+import type { ChatMessage } from "@webcore/shared/types/messaging";
 import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from "@aws-sdk/client-bedrock-runtime"; // AWS SDK Import
 import { truncateMessages, estimateTokenCount } from "../src/utils/messageUtils"; // Import truncation utils
 
@@ -24,6 +24,10 @@ if (!accessKeyId || !secretAccessKey) {
   // For now, the client might still be instantiated but fail later.
 }
 
+// --- DIAGNOSIS LOGGING --- 
+console.log("[DIAGNOSIS] Creating Bedrock client with region:", process.env.AWS_REGION || "us-west-2");
+// --- END DIAGNOSIS LOGGING ---
+
 // Instantiate AWS Bedrock Runtime Client
 const bedrockClient = new BedrockRuntimeClient({
   region: process.env.AWS_REGION || "us-west-2", // Default region now us-west-2
@@ -44,6 +48,19 @@ export const config = {
 };
 
 export default async function handler(req: Request) {
+  // --- DIAGNOSIS LOGGING ---
+  console.log("[DIAGNOSIS] Request received, AWS credentials state:", {
+    accessKeyId: accessKeyId ? "PRESENT" : "MISSING",
+    secretAccessKey: secretAccessKey ? "PRESENT" : "MISSING",
+    region: process.env.AWS_REGION || "MISSING",
+    env: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
+    requestHeaders: Object.fromEntries([...req.headers.entries()]),
+    requestMethod: req.method,
+    timestamp: new Date().toISOString()
+  });
+  // --- END DIAGNOSIS LOGGING ---
+
   if (req.method === 'OPTIONS') {
     // Handle preflight request
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -65,7 +82,14 @@ export default async function handler(req: Request) {
     }
 
     // Parse the stored raw body
-    const body = JSON.parse(rawBody);
+    let body;
+    try {
+      body = JSON.parse(rawBody);
+    } catch (e) {
+      console.error("[Backend Debug] Invalid JSON in request body:", e);
+      const errorBody = { error: 'Invalid request body: JSON parsing failed.' };
+      return new Response(JSON.stringify(errorBody), { status: 400, headers: corsHeadersJson });
+    }
 
     // Extract potential context and original messages
     const originalMessages: ChatMessage[] = body.messages;
@@ -153,7 +177,15 @@ export default async function handler(req: Request) {
 
     console.log("[Backend] Sending Payload to Bedrock:", JSON.stringify(bedrockPayload, null, 2));
 
-    console.log("[AWS Cred Debug] About to send command to Bedrock..."); // Log before send
+    // --- DIAGNOSIS LOGGING ---
+    console.log("[DIAGNOSIS] Pre-Bedrock call state:", {
+      modelId: ANTHROPIC_MODEL_ID,
+      messageCount: finalBedrockMessages.length,
+      timestamp: new Date().toISOString()
+    });
+    // --- END DIAGNOSIS LOGGING ---
+
+    console.log("[AWS Cred Debug] About to send command to Bedrock...");
     // --- Replace OpenAI Fetch with Bedrock SDK Call --- 
     try {
       const command = new InvokeModelWithResponseStreamCommand({
@@ -285,6 +317,20 @@ export default async function handler(req: Request) {
       });
       */
     } catch (error) {
+       // --- DIAGNOSIS LOGGING ---
+       console.log("[DIAGNOSIS] Bedrock error details:", {
+         errorName: error instanceof Error ? error.name : 'unknown',
+         errorMessage: error instanceof Error ? error.message : String(error),
+         errorCode: error && typeof error === 'object' && '$metadata' in error && 
+           error.$metadata && typeof error.$metadata === 'object' && 'httpStatusCode' in error.$metadata ? 
+           error.$metadata.httpStatusCode : undefined,
+         requestId: error && typeof error === 'object' && '$metadata' in error && 
+           error.$metadata && typeof error.$metadata === 'object' && 'requestId' in error.$metadata ? 
+           error.$metadata.requestId : undefined,
+         timestamp: new Date().toISOString()
+       });
+       // --- END DIAGNOSIS LOGGING ---
+       
        // Log specific Bedrock errors if possible
        console.error("[Backend] Error invoking Bedrock model:", error);
        // Add more detail about the error if available

@@ -58,8 +58,11 @@ export const useFirebase = () => {
     }
     setIsLoading(true)
     // Check if chrome.identity is available
+    console.log("[Auth Debug] About to call chrome.identity.getAuthToken. chrome:", typeof chrome, "chrome.identity:", chrome?.identity)
     if (typeof chrome !== "undefined" && chrome.identity?.getAuthToken) {
+      console.log("[Auth Debug] Calling chrome.identity.getAuthToken...")
       chrome.identity.getAuthToken({ interactive: true }, async (token) => {
+        console.log("[Auth Debug] getAuthToken callback fired. token:", token, "lastError:", chrome.runtime.lastError)
         if (chrome.runtime.lastError || !token) {
           console.error(
             "Error getting auth token:",
@@ -78,6 +81,7 @@ export const useFirebase = () => {
           if (!auth) {
             throw new Error("Firebase auth became null unexpectedly.")
           }
+          console.log("[Auth Debug] About to call signInWithCredential with credential:", credential)
           await signInWithCredential(auth, credential)
           // setUser will be updated by onAuthStateChanged
           console.log("signInWithCredential successful")

@@ -2,7 +2,7 @@
 // Listens for port connections, fetches the backend /api/chat endpoint, and streams each chunk to the sidepanel via the port.
 // Handles stream completion and errors.
 
-// import type { ChatMessage } from "@webcore/shared/messaging-types"
+// import type { ChatMessage } from "@webcore/shared/types/messaging"
 
 // Plasmo/Chrome extension background scripts can use the chrome.runtime.onConnect API
 chrome.runtime.onConnect.addListener((port) => {

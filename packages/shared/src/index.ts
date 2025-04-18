@@ -1,9 +1,8 @@
-// Re-export types from other files in the shared package
-export * from './messaging-types'
+// Re-export types and constants from their respective modules
+export * from './types';
+export * from './constants';
 
-// Keep existing exports if they are intended to be shared
-export const SHARED_CONSTANT = 'Hello from shared package!'
-
+// Types that might be directly defined here
 export type SharedType = {
   id: string
   value: number

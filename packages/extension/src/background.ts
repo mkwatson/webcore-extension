@@ -1,4 +1,5 @@
 // packages/extension/src/background.ts
+import "./background/callApiStream" // Import to register the listener
 
 // Listen for clicks on the extension's toolbar icon
 chrome.action.onClicked.addListener(async (tab) => {
