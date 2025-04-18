@@ -61,24 +61,17 @@ const createMockModelErrorChunk = (message: string = 'Simulated model error') =>
   }
 });
 
-// Helper to create a mock Request object
-function createMockRequest(method: string, body: any = null, headersInit: HeadersInit = {}): Request {
-    const url = 'http://localhost/api/chat'; // Dummy URL
-    const headers = new Headers(headersInit); 
+// Helper to create a mock Request object - stricter body type
+function createMockRequest(method: string, body: Record<string, unknown> | null = null, headersInit: HeadersInit = {}): Request {
+    const url = 'http://localhost/api/chat';
+    const headers = new Headers(headersInit);
 
     let bodyInit: BodyInit | null = null;
     if (body !== null) {
-        try {
-            bodyInit = JSON.stringify(body);
-            if (!headers.has('Content-Type')) { 
-                headers.set('Content-Type', 'application/json');
-            }
-        } catch (e) {
-             if (typeof body === 'string') {
-                bodyInit = body;
-            } else {
-                bodyInit = String(body);
-            }
+        // No try-catch needed here as Record<string, unknown> should always stringify
+        bodyInit = JSON.stringify(body);
+        if (!headers.has('Content-Type')) { 
+            headers.set('Content-Type', 'application/json');
         }
     }
     
@@ -90,8 +83,8 @@ function createMockRequest(method: string, body: any = null, headersInit: Header
     return request;
 }
 
-// Helper to read JSON response body
-async function readResponseJson(response: Response): Promise<any> {
+// Helper to read JSON response body - returns unknown for safety
+async function readResponseJson(response: Response): Promise<unknown> { // Changed return type
     try {
         return await response.json();
     } catch (e) {
@@ -117,9 +110,11 @@ describe('API Handler: /api/chat', () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
         
          bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             body: (async function*() { 
                  yield { chunk: { bytes: new TextEncoder().encode(JSON.stringify({ type: 'message_start', message: {} })) } };
                  yield { chunk: { bytes: new TextEncoder().encode(JSON.stringify({ type: 'message_stop' })) } };
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
              })() as AsyncIterable<any> 
         });
     });
@@ -142,30 +137,56 @@ describe('API Handler: /api/chat', () => {
             const req = createMockRequest('POST', { someOtherData: 'value' });
             const response = await handler(req);
             expect(response.status).toBe(400);
-            expect(await readResponseJson(response)).toEqual({ error: 'Invalid request body: messages array is required.' });
+            const body = await readResponseJson(response);
+            // Type check for unknown
+            expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
+            if (typeof body === 'object' && body !== null && 'error' in body) {
+                expect((body as { error: string }).error).toEqual('Invalid request body: messages array is required.');
+            }
         });
 
         it('should reject POST requests with empty "messages" array with 400', async () => {
             const req = createMockRequest('POST', { messages: [] });
             const response = await handler(req);
             expect(response.status).toBe(400);
-             expect(await readResponseJson(response)).toEqual({ error: 'Invalid request body: messages array is required.' });
+            const body = await readResponseJson(response);
+            // Type check for unknown
+            expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
+            if (typeof body === 'object' && body !== null && 'error' in body) {
+                expect((body as { error: string }).error).toEqual('Invalid request body: messages array is required.');
+            }
         });
 
         it('should reject POST requests where "messages" is not an array with 400', async () => {
-            const req = createMockRequest('POST', { messages: 'not-an-array' });
+            // Note: createMockRequest expects Record<string, unknown>, so this body structure is now typed
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const req = createMockRequest('POST', { messages: 'not-an-array' as any }); // Use `as any` here intentionally for the test setup
             const response = await handler(req);
             expect(response.status).toBe(400);
-            expect(await readResponseJson(response)).toEqual({ error: 'Invalid request body: messages array is required.' });
+            const body = await readResponseJson(response);
+            // Type check for unknown
+            expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
+            if (typeof body === 'object' && body !== null && 'error' in body) {
+                expect((body as { error: string }).error).toEqual('Invalid request body: messages array is required.');
+            }
         });
         
          it('should return 400 if request body is invalid JSON', async () => {
-            const req = createMockRequest('POST', '{invalid json', { 'Content-Type': 'application/json'}); 
-            const response = await handler(req);
+            // Construct request manually for invalid JSON string body
+            const headers = new Headers({ 'Content-Type': 'application/json'});
+            const request = new Request('http://localhost/api/chat', {
+                method: 'POST',
+                headers: headers,
+                body: '{invalid json' 
+            });
+            const response = await handler(request);
             expect(response.status).toBe(400); 
-            const responseBody = await readResponseJson(response);
-            expect(responseBody).toHaveProperty('error');
-            expect(responseBody.error).toBe('Invalid request body: messages array is required.');
+            const body = await readResponseJson(response);
+            // Type check for unknown
+            expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
+            if (typeof body === 'object' && body !== null && 'error' in body) {
+                expect((body as { error: string }).error).toBe('Invalid request body: messages array is required.');
+            }
          });
          
          it('should handle OPTIONS requests for CORS preflight', async () => {
@@ -309,6 +330,7 @@ describe('API Handler: /api/chat', () => {
                 yield createMockMessageStopEvent();
             })();
             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
 
             const messages: ChatMessage[] = [{ role: 'user', content: 'Test' }];
@@ -330,6 +352,7 @@ describe('API Handler: /api/chat', () => {
                 yield createMockDeltaEvent('a longer response.');
                 yield createMockMessageStopEvent();
             })();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
             const req = createMockRequest('POST', { messages: [{ role: 'user', content: 'Long test' }] });
             const response = await handler(req);
@@ -349,6 +372,7 @@ describe('API Handler: /api/chat', () => {
                  yield { chunk: { bytes: new TextEncoder().encode(JSON.stringify({ type: 'content_block_stop', index: 0 })) } };
                 yield createMockMessageStopEvent();
             })();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
             const req = createMockRequest('POST', { messages: [{ role: 'user', content: 'Ignore test' }] });
             const response = await handler(req);
@@ -366,6 +390,7 @@ describe('API Handler: /api/chat', () => {
                 yield createMockDeltaEvent('End');
                 yield createMockMessageStopEvent();
             })();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
             const req = createMockRequest('POST', { messages: [{ role: 'user', content: 'Empty delta test' }] });
             const response = await handler(req);
@@ -388,8 +413,12 @@ describe('API Handler: /api/chat', () => {
 
             const response = await handler(req);
             expect(response.status).toBe(500);
-            const body = await readResponseJson(response);
-            expect(body).toEqual({ error: testError.message }); 
+            const body = await readResponseJson(response); // body is unknown
+            // Type check for unknown
+            expect(typeof body === 'object' && body !== null && 'error' in body).toBe(true);
+            if (typeof body === 'object' && body !== null && 'error' in body) {
+                expect((body as { error: string }).error).toEqual(testError.message);
+            }
         });
         
         it('returns 500 if Bedrock stream yields an SDK error event', async () => {
@@ -402,6 +431,7 @@ describe('API Handler: /api/chat', () => {
                 yield createMockDeltaEvent(dataAfterError); 
             })();
             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
 
             const messages: ChatMessage[] = [{ role: 'user', content: 'Test SDK Stream Error' }];
@@ -425,6 +455,7 @@ describe('API Handler: /api/chat', () => {
                 yield createMockMessageStopEvent();
             })();
             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
 
             const messages: ChatMessage[] = [{ role: 'user', content: 'Test Model Stream Error' }];
@@ -444,6 +475,7 @@ describe('API Handler: /api/chat', () => {
                 throw new Error(unexpectedErrorMessage);
             })();
             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bedrockMock.on(InvokeModelWithResponseStreamCommand).resolves({ body: mockBedrockStream as AsyncIterable<any> });
             
             const messages: ChatMessage[] = [{ role: 'user', content: 'Test Unexpected Error' }];
