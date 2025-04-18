@@ -296,113 +296,142 @@ function IndexSidePanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages]) // Dependency array ensures this runs when messages update
 
-  // Effect to extract content when the sidepanel mounts
+  // Effect to extract content when the sidepanel mounts and user is logged in
   useEffect(() => {
     // console.log("[UI Debug] Sidepanel mounted, triggering content extraction."); // Removed log
-    handleGetContent();
-    // This effect should run only once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps 
-  }, []);
+    if (user) { // Only extract content if logged in
+        handleGetContent();
+    }
+    // This effect should run only once on mount or when user logs in/out
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // Re-run if user state changes
 
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: "0 16px 16px 16px", // Adjust padding slightly
-        height: "100vh"
+        height: "100vh",
+        boxSizing: 'border-box' // Ensure padding doesn't add to height
       }}>
-      <div style={{ paddingTop: 16 }}>
-        {" "}
-        {/* Added padding top here */}
-        <h2>WebCore SidePanel</h2>
-        {isLoading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>Error: {error}</p>}
-        {user ? (
-          <div>
-            <p>Signed in as:</p>
-            <p>
-              <strong>{getUserDisplay()}</strong>
-            </p>
-            <button onClick={onLogout} disabled={isLoading}>
-              Sign Out
-            </button>
-          </div>
-        ) : (
-          <button onClick={onLogin} disabled={isLoading}>
-            Sign In with Google
-          </button>
-        )}
+      {isLoading && ( // Show loading indicator fullscreen if loading auth state
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <p>Loading...</p>
+        </div>
+      )}
+
+      {!isLoading && !user && ( // Signed-out state
         <div
           style={{
-            marginTop: "10px",
-            borderTop: "1px solid #eee",
-            paddingTop: "10px"
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            padding: "16px",
+            textAlign: 'center'
           }}>
+          <h2 style={{ marginBottom: '8px', fontSize: '20px', fontWeight: '600' }}>Welcome to WebCore</h2>
+          <p style={{ marginBottom: '32px', color: '#555', fontSize: '14px' }}>Sign in to activate the AI assistant.</p>
+          {error && <p style={{ color: "red", marginBottom: '16px' }}>Error: {error}</p>}
           <button 
-            onClick={handleSummarize} 
-            disabled={isExtracting || !extractedContent || !user} // Disable if extracting, no content, or not logged in
+            onClick={onLogin} 
+            disabled={isLoading} 
+            style={{ 
+                // Google-like button styling
+                backgroundColor: '#ffffff',
+                color: '#444', // Dark grey text
+                border: '1px solid #dadce0', // Subtle grey border
+                borderRadius: '4px',
+                padding: '10px 24px', // Adjust padding
+                fontSize: '14px', 
+                fontWeight: '500',
+                cursor: 'pointer', 
+                display: 'inline-flex', // Align icon and text if icon added later
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)', // Subtle shadow
+                transition: 'border-color .218s, background-color .218s, box-shadow .218s',
+                // Add hover effect (optional)
+                // ':hover': { backgroundColor: '#f8f9fa' }
+            }}
           >
-            {/* {isSummarizing ? "Summarizing..." : "Summary"} */}
-            {isExtracting ? "Loading Page..." : "Summary"} {/* Show loading state based on isExtracting */}
+            {/* Add Google G icon SVG here later if desired */}
+            {/* <img src='google-icon.svg' alt="" style={{ marginRight: '12px', height: '18px', width: '18px' }} /> */}
+            Sign In with Google
           </button>
-          {extractionError && (
-            <p style={{ color: "red", marginTop: "10px" }}>
-              Error: {extractionError}
-            </p>
-          )}
-          {/* Comment out the debug display for extracted content */}
-          {/* {extractedContent && (
+        </div>
+      )}
+
+      {!isLoading && user && ( // Signed-in state - Wrap existing UI
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0 16px 16px 16px' }}> 
+          {/* Keep original padding here */}
+          <div style={{ paddingTop: 16 }}>
+            {" "}
+            {/* Added padding top here */}
+            <h2>WebCore SidePanel</h2> 
+            {/* Removed loading/error here as handled above or differently below */}
+            {/* User info section - keep for now, address in next step */}
+            <div> 
+              <p>Signed in as:</p>
+              <p>
+                <strong>{getUserDisplay()}</strong>
+              </p>
+              <button onClick={onLogout} disabled={isLoading}>
+                Sign Out
+              </button>
+            </div>
             <div
               style={{
                 marginTop: "10px",
-                maxHeight: "200px", // Reduced height slightly
-                overflowY: "auto",
-                background: "#f9f9f9",
-                border: "1px solid #ddd",
-                padding: "5px"
+                borderTop: "1px solid #eee",
+                paddingTop: "10px"
               }}>
-              <h4>Extracted Content (Debug):</h4>
-              <p>
-                <strong>Title:</strong> {extractedContent.title}
-              </p>
-              <p>
-                <strong>URL:</strong> {extractedContent.url}
-              </p>
-              <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                {extractedContent.markdownContent}
-              </pre>
+              <button
+                onClick={handleSummarize}
+                disabled={isExtracting || !extractedContent || !user} // Disable if extracting, no content, or not logged in
+              >
+                {/* {isSummarizing ? "Summarizing..." : "Summary"} */}
+                {isExtracting ? "Loading Page..." : "Summary"} {/* Show loading state based on isExtracting */}
+              </button>
+              {extractionError && (
+                <p style={{ color: "red", marginTop: "10px" }}>
+                  Error: {extractionError}
+                </p>
+              )}
+              {/* Comment out the debug display for extracted content */}
+              {/* {extractedContent && (...)} */}
             </div>
-          )} */}
-        </div>
-      </div>
+          </div>
 
-      <MessageList messages={messages} ref={messagesEndRef} />
+          <MessageList messages={messages} ref={messagesEndRef} />
 
-      <form
-        onSubmit={handleSendMessage}
-        style={{
-          marginTop: "auto",
-          borderTop: "1px solid #ccc",
-          paddingTop: "10px",
-          display: "flex"
-        }}>
-        <input
-          type="text"
-          placeholder="Ask something..."
-          style={{ flexGrow: 1, padding: "8px", marginRight: "8px" }}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={isLoading || isWaitingForResponse || isExtracting || !extractedContent} // Also disable if extracting or no content
-        />
-        <button
-          type="submit"
-          style={{ padding: "8px 12px" }}
-          disabled={isLoading || !inputValue.trim() || isWaitingForResponse || isExtracting || !extractedContent} // Also disable if extracting or no content
-         >
-          {isWaitingForResponse ? "Waiting..." : "Send"}
-        </button>
-      </form>
+          <form
+            onSubmit={handleSendMessage}
+            style={{
+              marginTop: "auto",
+              borderTop: "1px solid #ccc",
+              paddingTop: "10px",
+              display: "flex"
+            }}>
+            <input
+              type="text"
+              placeholder="Ask something..."
+              style={{ flexGrow: 1, padding: "8px", marginRight: "8px" }}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              disabled={isLoading || isWaitingForResponse || isExtracting || !extractedContent} // Also disable if extracting or no content
+            />
+            <button
+              type="submit"
+              style={{ padding: "8px 12px" }}
+              disabled={isLoading || !inputValue.trim() || isWaitingForResponse || isExtracting || !extractedContent} // Also disable if extracting or no content
+            >
+              {isWaitingForResponse ? "Waiting..." : "Send"}
+            </button>
+          </form>
+        </div> // End signed-in wrapper
+      )}
     </div>
   )
 }
