@@ -1,30 +1,24 @@
-.new-tab {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  color: #333;
-  display: block;
-  font-size: 12px;
-  line-height: 16px;
-  margin: 0 0 10px;
-  padding: 10px;
-  position: relative;
-  text-decoration: none;
-  width: 100%;
-}
+/* Remove unused styles */
 
 @keyframes highlight-pulse {
   0% {
-    background-color: #a8d3ff; /* Lighter blue highlight start */
-    box-shadow: 0 0 3px 1px #a8d3ff;
+    /* Use Chakra bg color token if possible, otherwise hardcode */
+    /* background-color: #a8d3ff; // Lighter blue highlight start */
+    background-color: var(
+      --chakra-colors-blue-50
+    ); /* Example using Chakra variable */
+    box-shadow: 0 0 3px 1px var(--chakra-colors-blue-100);
   }
   50% {
-    background-color: #cce0ff; /* Slightly different blue mid-pulse */
-    box-shadow: 0 0 6px 2px #cce0ff;
+    /* background-color: #cce0ff; // Slightly different blue mid-pulse */
+    background-color: var(--chakra-colors-blue-100);
+    box-shadow: 0 0 6px 2px var(--chakra-colors-blue-200);
   }
   100% {
-    background-color: #d1e7ff; /* Return to original user message background */
+    /* background-color: #d1e7ff; // Return to original user message background */
+    background-color: var(
+      --chakra-colors-blue-100
+    ); /* Match final bg prop in MessageList */
     box-shadow: none;
   }
 }

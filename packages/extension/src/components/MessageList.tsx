@@ -1,4 +1,5 @@
-import type { ChatMessage } from "@webcore/shared/types/messaging"
+import { ChatMessage } from "@webcore/shared/types/messaging"
+import { Box, Text } from "@chakra-ui/react" // Import Chakra components
 import React, { forwardRef } from "react"
 
 // Use the extended type from sidepanel (or define it locally/share it)
@@ -12,73 +13,63 @@ interface MessageListProps {
 }
 
 // Use forwardRef to allow parent component to pass a ref to the underlying div
-const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
-  (
-    { messages },
-    ref // Ref is the second argument
-  ) => {
-    // Simple check for empty messages array
-    if (!messages || messages.length === 0) {
-      // Return null or a placeholder, avoiding unnecessary rendering
-      return null
-    }
-
-    return (
-      <div
-        ref={ref} // Attach the forwarded ref here
-        style={{
-          flexGrow: 1, // Allows the list to take available space
-          overflowY: "auto", // Enable scrolling for long lists
-          padding: "10px 0", // Add padding top/bottom, remove side padding
-          display: "flex",
-          flexDirection: "column" // Keep messages ordered top-to-bottom
-          // Removed column-reverse as scroll-to-bottom logic will handle positioning
-        }}>
-        {messages.map((msg, index) => {
-          // Apply highlight class if the flag is set
-          const messageClasses = msg.isActionTriggered ? "message message--highlight-action" : "message";
-
-          return (
-            <div
-              key={msg.id || index} // Prefer id if available (for placeholders), fallback to index
-              className={messageClasses} // Use className for CSS styling
-              style={{
-                marginBottom: "10px",
-                padding: "8px 12px",
-                borderRadius: "8px",
-                maxWidth: "80%",
-                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                background: msg.role === "user" ? "#d1e7ff" : "#f8f9fa", // Simple background diff
-                color: "#000",
-                marginLeft: msg.role === "user" ? "auto" : "10px", // Align user right, assistant left
-                marginRight: msg.role === "user" ? "10px" : "auto"
-              }}>
-              {/* Style the loading indicator differently */}
-              {msg.content === "..." ? (
-                <div style={{ textAlign: 'center', color: '#6c757d', fontStyle: 'italic' }}>
-                  {msg.content}
-                </div>
-              ) : (
-                /* Use pre-wrap for regular message content */
-                <pre
-                  style={{
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                    margin: 0,
-                    fontFamily: "inherit"
-                  }}>
-                  {msg.content}
-                </pre>
-              )}
-            </div>
-          )
-        })}
-        {/* Add a dummy div at the end to ensure scrollIntoView targets the very bottom */}
-        <div style={{ float: "left", clear: "both" }} />
-      </div>
-    )
+const MessageList = forwardRef<HTMLDivElement, MessageListProps>((
+  { messages },
+  _ref // Ref is the second argument - Mark as unused with underscore
+) => {
+  // Simple check for empty messages array
+  if (!messages || messages.length === 0) {
+    // Return null or a placeholder, avoiding unnecessary rendering
+    return null
   }
-)
+
+  return (
+    <Box w="100%"> {/* Ensure it takes full width */}
+      {messages.map((msg, index) => {
+        const messageClasses =
+          msg.isActionTriggered ? "message message--highlight-action" : "message";
+        const isUser = msg.role === "user";
+        const isWaiting = msg.content === "...";
+
+        return (
+          <Box
+            key={msg.id || index}
+            className={messageClasses} // Pass className for highlight animation
+            alignSelf={isUser ? "flex-end" : "flex-start"}
+            bg={isUser ? "blue.100" : "gray.100"} // Use Chakra theme colors
+            color={isWaiting ? "gray.500" : "black"} // Grey out loading dots
+            px={3} // Chakra padding
+            py={2}
+            mb={2} // Chakra margin
+            borderRadius="lg" // Chakra border radius
+            maxWidth="80%"
+            fontStyle={isWaiting ? "italic" : "normal"}
+            textAlign={isWaiting ? "center" : "left"}
+            ml={isUser ? "auto" : 0} // Use 0 instead of 10px for cleaner alignment
+            mr={isUser ? 0 : "auto"}
+          >
+            {/* Use Text component with pre-wrap for message content */}
+            {/* Render loading state directly, or Text for regular messages */}
+            {isWaiting ? (
+              msg.content 
+            ) : (
+              <Text 
+                whiteSpace="pre-wrap" 
+                wordBreak="break-word"
+                fontSize="sm" // Apply consistent small font size
+                lineHeight="base" // Apply base line height for readability
+              >
+                {msg.content}
+              </Text>
+            )}
+          </Box>
+        )
+      })}
+      {/* Dummy div for scrolling - parent Box in sidepanel handles ref */}
+      {/* <div style={{ float: "left", clear: "both" }} /> */}
+    </Box>
+  )
+})
 
 // Add display name for React DevTools
 MessageList.displayName = "MessageList"
