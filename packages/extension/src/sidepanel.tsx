@@ -404,9 +404,7 @@ function IndexSidePanel() {
                 onClick={onLogin}
                 isLoading={isLoading}
                 colorScheme="blue" // Use Chakra color scheme
-                variant="outline"
-                boxShadow="sm" // Add slight shadow
-                // size="lg" // Make button larger
+                variant="outline" // Use outline variant for consistency
               >
                 Sign In with Google
               </Button>
