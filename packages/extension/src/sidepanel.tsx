@@ -12,15 +12,16 @@ import {
   Flex,
   Heading,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Text,
+  Textarea,
   VStack
 } from "@chakra-ui/react" // Import Chakra components
 import { useEffect, useRef, useState } from "react" // Add useState, useEffect, and useRef imports
+import TextareaAutosize from 'react-textarea-autosize'; // Import TextareaAutosize
 import { sendToBackground } from "@plasmohq/messaging" // Import Plasmo messaging
 
 import MessageList from "./components/MessageList" // Revert to relative path import
@@ -462,7 +463,7 @@ function IndexSidePanel() {
                     <Button 
                         onClick={handleSummarize}
                         isDisabled={isExtracting || !extractedContent || !user}
-                        size="sm" 
+                        size="sm" // Match Send button size
                         variant="outline" 
                         mb={2} // Margin bottom to space from input
                     >
@@ -476,18 +477,30 @@ function IndexSidePanel() {
                 )}
 
                 {/* Input Form Area */}
-                <form onSubmit={handleFormSubmit} style={{ display: "flex" }}>
-                    <Input
+                <form onSubmit={handleFormSubmit} style={{ display: "flex", alignItems: 'flex-end' }}>
+                    <Textarea
+                        as={TextareaAutosize}
+                        minRows={1}
+                        maxRows={8}
                         placeholder="Ask something..."
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         isDisabled={isLoading || isWaitingForResponse || isExtracting || !extractedContent}
                         mr={2} // Margin right
+                        fontSize="sm" // Match chat text size
+                        resize="none" // Prevent manual resize handle
+                        minH="auto" // Override default min-height
+                        _focusVisible={{
+                            zIndex: 1, 
+                            borderColor: "blue.500", 
+                            boxShadow: `0 0 0 1px var(--chakra-colors-blue-500)`
+                        }}
                     />
                     <Button
                         type="submit"
+                        size="sm"
                         isDisabled={isLoading || !inputValue.trim() || isWaitingForResponse || isExtracting || !extractedContent}
-                        isLoading={isWaitingForResponse} // Use Chakra loading state
+                        isLoading={isWaitingForResponse}
                         loadingText="Send"
                     >
                         Send
