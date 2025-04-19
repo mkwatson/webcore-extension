@@ -1,8 +1,14 @@
 import type { ChatMessage } from "@webcore/shared/types/messaging"
 import React, { forwardRef } from "react"
 
+// Use the extended type from sidepanel (or define it locally/share it)
+interface ChatMessageWithId extends ChatMessage {
+  id?: string;
+  isActionTriggered?: boolean;
+}
+
 interface MessageListProps {
-  messages: ChatMessage[]
+  messages: ChatMessageWithId[] // Update to use extended type
 }
 
 // Use forwardRef to allow parent component to pass a ref to the underlying div
@@ -28,32 +34,38 @@ const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
           flexDirection: "column" // Keep messages ordered top-to-bottom
           // Removed column-reverse as scroll-to-bottom logic will handle positioning
         }}>
-        {messages.map((msg, index) => (
-          <div
-            key={index} // Simple key for now, consider more robust keys later
-            style={{
-              marginBottom: "10px",
-              padding: "8px 12px",
-              borderRadius: "8px",
-              maxWidth: "80%",
-              alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              background: msg.role === "user" ? "#d1e7ff" : "#f8f9fa", // Simple background diff
-              color: "#000",
-              marginLeft: msg.role === "user" ? "auto" : "10px", // Align user right, assistant left
-              marginRight: msg.role === "user" ? "10px" : "auto"
-            }}>
-            {/* Use pre-wrap to respect newlines in message content */}
-            <pre
+        {messages.map((msg, index) => {
+          // Apply highlight class if the flag is set
+          const messageClasses = msg.isActionTriggered ? "message message--highlight-action" : "message";
+
+          return (
+            <div
+              key={msg.id || index} // Prefer id if available (for placeholders), fallback to index
+              className={messageClasses} // Use className for CSS styling
               style={{
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                margin: 0,
-                fontFamily: "inherit"
+                marginBottom: "10px",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                maxWidth: "80%",
+                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                background: msg.role === "user" ? "#d1e7ff" : "#f8f9fa", // Simple background diff
+                color: "#000",
+                marginLeft: msg.role === "user" ? "auto" : "10px", // Align user right, assistant left
+                marginRight: msg.role === "user" ? "10px" : "auto"
               }}>
-              {msg.content}
-            </pre>
-          </div>
-        ))}
+              {/* Use pre-wrap to respect newlines in message content */}
+              <pre
+                style={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  margin: 0,
+                  fontFamily: "inherit"
+                }}>
+                {msg.content}
+              </pre>
+            </div>
+          )
+        })}
         {/* Add a dummy div at the end to ensure scrollIntoView targets the very bottom */}
         <div style={{ float: "left", clear: "both" }} />
       </div>

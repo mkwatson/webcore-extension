@@ -12,11 +12,12 @@ import { useFirebase } from "./firebase/hook" // Import the hook
 // Assuming package name is @webcore/shared
 
 // Optional: Import basic styling if needed
-// import './style.css'
+import './style.css'
 
-// Extend ChatMessage to include an optional ID
+// Extend ChatMessage to include an optional ID and action trigger flag
 interface ChatMessageWithId extends ChatMessage {
   id?: string; // Unique ID for tracking placeholder messages
+  isActionTriggered?: boolean; // Flag for highlighting messages triggered by actions
 }
 
 // Constant for the summary prompt
@@ -45,6 +46,8 @@ function IndexSidePanel() {
   const [messages, setMessages] = useState<ChatMessageWithId[]>([])
   // State to track if waiting for API response
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  // State to track if summary has been generated for the current content
+  const [isSummaryGenerated, setIsSummaryGenerated] = useState(false);
   // Ref for the message list container
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -81,6 +84,7 @@ function IndexSidePanel() {
       // Process the response (already in GetContentResponse format)
       if (response.payload) {
         setExtractedContent(response.payload)
+        setIsSummaryGenerated(false); // Reset summary state when new content is loaded
       } else if (response.error) {
         setExtractionError(response.error)
       } else {
@@ -99,175 +103,194 @@ function IndexSidePanel() {
   }
 
   // Function to handle sending a message with streaming
-  const handleSendMessage = async (event: React.FormEvent<HTMLFormElement> | { target: { value: string } }) => {
-    // Check if event is synthetic (from handleSummarize)
-    const isSyntheticEvent = !("preventDefault" in event)
-    const content = isSyntheticEvent ? event.target.value.trim() : (event.target as HTMLFormElement).querySelector('input')?.value.trim() || ""
+  const handleSendMessage = async (
+      event?: React.FormEvent<HTMLFormElement> | { target: { value: string } }, 
+      predefinedMessage?: ChatMessageWithId
+  ) => {
+      let content = "";
+      let userMessage: ChatMessageWithId;
 
-    if (!isSyntheticEvent) {
-      event.preventDefault()
-    }
-    
-    // console.log(`[UI Debug] handleSendMessage called. Content: "${content}", isWaiting: ${isWaitingForResponse}`) // Removed log
+      if (predefinedMessage) {
+          // If a predefined message is provided, use it directly
+          userMessage = predefinedMessage;
+          content = predefinedMessage.content;
+          // No need to prevent default or clear input value here
+      } else if (event) {
+          // Handle form submission or synthetic event like before
+          const isSyntheticEvent = !("preventDefault" in event);
+          content = isSyntheticEvent 
+              ? (event.target as { value: string }).value.trim() 
+              : (event.target as HTMLFormElement).querySelector('input')?.value.trim() || "";
 
-    // Check if content is available before sending any message
-    if (!extractedContent) {
-       console.warn("[UI Debug] handleSendMessage called but extractedContent is null."); // Keep warning
-       // Optionally inform the user, e.g., set an error state
-       // setErrorState("Page content has not been loaded yet.");
-       setIsWaitingForResponse(false); // Ensure waiting state is reset
-       return; // Don't send if no content context
-    }
-
-    if (!content || isWaitingForResponse) {
-      // console.log("[UI Debug] handleSendMessage returning early (no content or waiting).") // Removed log
-      return
-    }
-
-    setIsWaitingForResponse(true)
-    setInputValue("") // Clear input after sending
-
-    // Add user message to state
-    const userMessage: ChatMessageWithId = { role: "user", content }
-    const placeholderId = `placeholder-${Date.now()}`
-    const placeholderMessage: ChatMessageWithId = {
-      id: placeholderId,
-      role: "assistant",
-      content: ""
-    }
-
-    // Build the message array: *only* chat history + new user message
-    // Context is sent separately via the payload.context object when needed
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const chatHistory = messages.map(({ id, ...rest }) => rest)
-    const messagesToSend: ChatMessage[] = [
-      ...chatHistory,
-      { role: "user", content }
-    ]
-
-    // console.log("[UI Debug] Base messages for payload:", messagesToSend) // Removed log
-
-    setMessages((prev) => [...prev, userMessage, placeholderMessage])
-
-    // Determine if context needs to be sent - ALWAYS send if available
-    const payloadToSend: { messages: ChatMessage[]; context?: { systemPrompt: string; pageContent: string; title?: string; url?: string } } = {
-      messages: messagesToSend
-    };
-
-    if (extractedContent) { // Check only if content exists
-      console.log("[UI Debug] Including context in this message."); // Updated log message slightly
-      payloadToSend.context = {
-        systemPrompt: SYSTEM_PROMPT,
-        pageContent: extractedContent.markdownContent,
-        title: extractedContent.title, // Include title in context
-        url: extractedContent.url     // Include URL in context
-      };
-    }
-
-    // --- Streaming via port ---
-    try {
-      // console.log("[UI Debug] Attempting to connect to background script port 'callApiStream'...") // Removed log
-      const port = chrome.runtime.connect({ name: "callApiStream" })
-      // console.log("[UI Debug] Port connection established. Sending payload:", payloadToSend) // Removed log
-      port.postMessage(payloadToSend) // Send the potentially augmented payload
+          if (!isSyntheticEvent) {
+              event.preventDefault();
+          }
+          setInputValue(""); // Clear input only if triggered by form/input event
+          userMessage = { role: "user", content }; // Create standard user message
+      } else {
+          // Should not happen if called correctly, but handle defensively
+          console.error("[UI Error] handleSendMessage called without event or predefined message.");
+          return;
+      }
       
-      let accumulatedContent = "" // Store the processed content delta
-      let sseBuffer = "" // Buffer for incomplete SSE messages
+      // console.log(`[UI Debug] handleSendMessage called. Content: "${content}", isWaiting: ${isWaitingForResponse}`) // Removed log
 
-      port.onMessage.addListener((msg) => {
-        console.log("[UI Stream Debug] Raw msg from background:", msg); // Log raw message
+      // Check if content context is available before sending any message
+      if (!extractedContent) {
+         console.warn("[UI Debug] handleSendMessage called but extractedContent is null."); // Keep warning
+         setIsWaitingForResponse(false); // Ensure waiting state is reset
+         return; // Don't send if no content context
+      }
 
-        if (msg.chunk) {
-          sseBuffer += msg.chunk;
-          const events = sseBuffer.split("\n\n");
-          sseBuffer = events.pop() || ""; 
+      if (!content || isWaitingForResponse) {
+        // console.log("[UI Debug] handleSendMessage returning early (no content or waiting).") // Removed log
+        return;
+      }
 
-          for (const event of events) {
-             console.log(`[UI Stream Debug] Processing event string: "${event}"`); // Log event string
-            if (event.trim() === "data: [DONE]") {
-              continue; 
-            }
+      setIsWaitingForResponse(true);
+      // setInputValue("") // Moved clearing input to event handling block
 
-            if (event.startsWith("data: ")) {
-              const dataString = event.substring(6).trim();
-              console.log(`[UI Stream Debug] Extracted data string: "${dataString}"`); // Log data string
-              try {
-                const parsedData = JSON.parse(dataString);
-                console.log("[UI Stream Debug] Parsed data:", parsedData); // Log parsed object
+      // Add user message (either predefined or created from event) to state
+      // const userMessage: ChatMessageWithId = { role: "user", content }; // Logic moved up
+      const placeholderId = `placeholder-${Date.now()}`;
+      const placeholderMessage: ChatMessageWithId = {
+        id: placeholderId,
+        role: "assistant",
+        content: ""
+      }
 
-                if (parsedData.content) {
-                  const contentDelta = parsedData.content;
-                  console.log(`[UI Stream Debug] Extracted content delta: "${contentDelta}"`); // Log delta
-                  accumulatedContent += contentDelta;
-                  console.log(`[UI Stream Debug] About to setMessages for placeholderId: ${placeholderId} with accumulated content: "${accumulatedContent.substring(0, 50)}..."`); // Log before setMessages
-                  setMessages((prev) =>
-                    prev.map((m) =>
-                      m.id === placeholderId
-                        ? { ...m, content: accumulatedContent }
-                        : m
-                    )
+      // Build the message array: *only* chat history + new user message
+      // Context is sent separately via the payload.context object when needed
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const chatHistory = messages.map(({ id, ...rest }) => rest)
+      const messagesToSend: ChatMessage[] = [
+        ...chatHistory,
+        userMessage
+      ]
+
+      // console.log("[UI Debug] Base messages for payload:", messagesToSend) // Removed log
+
+      setMessages((prev) => [...prev, userMessage, placeholderMessage])
+
+      // Determine if context needs to be sent - ALWAYS send if available
+      const payloadToSend: { messages: ChatMessage[]; context?: { systemPrompt: string; pageContent: string; title?: string; url?: string } } = {
+        messages: messagesToSend
+      };
+
+      if (extractedContent) { // Check only if content exists
+        console.log("[UI Debug] Including context in this message."); // Updated log message slightly
+        payloadToSend.context = {
+          systemPrompt: SYSTEM_PROMPT,
+          pageContent: extractedContent.markdownContent,
+          title: extractedContent.title, // Include title in context
+          url: extractedContent.url     // Include URL in context
+        };
+      }
+
+      // --- Streaming via port ---
+      try {
+        // console.log("[UI Debug] Attempting to connect to background script port 'callApiStream'...") // Removed log
+        const port = chrome.runtime.connect({ name: "callApiStream" })
+        // console.log("[UI Debug] Port connection established. Sending payload:", payloadToSend) // Removed log
+        port.postMessage(payloadToSend) // Send the potentially augmented payload
+        
+        let accumulatedContent = "" // Store the processed content delta
+        let sseBuffer = "" // Buffer for incomplete SSE messages
+
+        port.onMessage.addListener((msg) => {
+          console.log("[UI Stream Debug] Raw msg from background:", msg); // Log raw message
+
+          if (msg.chunk) {
+            sseBuffer += msg.chunk;
+            const events = sseBuffer.split("\n\n");
+            sseBuffer = events.pop() || ""; 
+
+            for (const event of events) {
+               console.log(`[UI Stream Debug] Processing event string: "${event}"`); // Log event string
+              if (event.trim() === "data: [DONE]") {
+                continue; 
+              }
+
+              if (event.startsWith("data: ")) {
+                const dataString = event.substring(6).trim();
+                console.log(`[UI Stream Debug] Extracted data string: "${dataString}"`); // Log data string
+                try {
+                  const parsedData = JSON.parse(dataString);
+                  console.log("[UI Stream Debug] Parsed data:", parsedData); // Log parsed object
+
+                  if (parsedData.content) {
+                    const contentDelta = parsedData.content;
+                    console.log(`[UI Stream Debug] Extracted content delta: "${contentDelta}"`); // Log delta
+                    accumulatedContent += contentDelta;
+                    console.log(`[UI Stream Debug] About to setMessages for placeholderId: ${placeholderId} with accumulated content: "${accumulatedContent.substring(0, 50)}..."`); // Log before setMessages
+                    setMessages((prev) =>
+                      prev.map((m) =>
+                        m.id === placeholderId
+                          ? { ...m, content: accumulatedContent }
+                          : m
+                      )
+                    );
+                  } else {
+                      console.log("[UI Stream Debug] Parsed data does not contain 'content' key.");
+                  }
+                } catch (parseError) {
+                  console.error(
+                    "[UI Stream Debug] Failed to parse JSON from SSE data:",
+                    dataString,
+                    parseError
                   );
-                } else {
-                    console.log("[UI Stream Debug] Parsed data does not contain 'content' key.");
                 }
-              } catch (parseError) {
-                console.error(
-                  "[UI Stream Debug] Failed to parse JSON from SSE data:",
-                  dataString,
-                  parseError
-                );
-              }
-            } else {
-              // Log if it's not empty and doesn't start with "data: "
-              if (event.trim()) {
-                  console.warn(`[UI Stream Debug] Received non-empty event string that doesn't start with 'data: ': "${event}"`);
+              } else {
+                // Log if it's not empty and doesn't start with "data: "
+                if (event.trim()) {
+                    console.warn(`[UI Stream Debug] Received non-empty event string that doesn't start with 'data: ': "${event}"`);
+                }
               }
             }
-          }
-        } else if (msg.done) {
-          console.log("[UI Stream Debug] Received {done: true} signal from background.");
-          setIsWaitingForResponse(false) // Allow sending new messages
-          port.disconnect()
-        } else if (msg.error) {
-          console.error("[UI Stream Debug] Received error from background port:", msg.error)
-          // Update the placeholder message to show the error
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === placeholderId ? { ...m, content: `Error: ${msg.error}` } : m
+          } else if (msg.done) {
+            console.log("[UI Stream Debug] Received {done: true} signal from background.");
+            setIsWaitingForResponse(false) // Allow sending new messages
+            port.disconnect()
+          } else if (msg.error) {
+            console.error("[UI Stream Debug] Received error from background port:", msg.error)
+            // Update the placeholder message to show the error
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === placeholderId ? { ...m, content: `Error: ${msg.error}` } : m
+              )
             )
-          )
-          setIsWaitingForResponse(false) // Allow sending new messages
-          port.disconnect()
-        }
-      });
-
-      // Handle port disconnection
-      port.onDisconnect.addListener(() => {
-        console.log("[UI Stream Debug] Background port disconnected.");
-        setIsWaitingForResponse(false); // Ensure waiting state is reset if port closes unexpectedly
-        // Check if the placeholder still exists and hasn't been fully replaced
-        setMessages(prev => {
-          const placeholderExists = prev.some(m => m.id === placeholderId && m.content === "");
-          if (placeholderExists) {
-            // If disconnected unexpectedly before completion, show an error or remove placeholder?
-            console.warn("[UI Stream Debug] Port disconnected but placeholder message might be incomplete or empty.");
-            // Option: Update placeholder to show an error
-            return prev.map(m => m.id === placeholderId ? {...m, content: "Error: Stream disconnected unexpectedly."} : m);
+            setIsWaitingForResponse(false) // Allow sending new messages
+            port.disconnect()
           }
-          return prev; // Otherwise, no change needed
         });
-      });
 
-    } catch (error) {
-      console.error("[UI Debug] Error establishing port connection or sending initial message:", error);
-      // Update placeholder to show connection error
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === placeholderId ? { ...m, content: `Error: Failed to connect to backend. ${error instanceof Error ? error.message : ''}` } : m
-        )
-      );
-      setIsWaitingForResponse(false);
-    }
+        // Handle port disconnection
+        port.onDisconnect.addListener(() => {
+          console.log("[UI Stream Debug] Background port disconnected.");
+          setIsWaitingForResponse(false); // Ensure waiting state is reset if port closes unexpectedly
+          // Check if the placeholder still exists and hasn't been fully replaced
+          setMessages(prev => {
+            const placeholderExists = prev.some(m => m.id === placeholderId && m.content === "");
+            if (placeholderExists) {
+              // If disconnected unexpectedly before completion, show an error or remove placeholder?
+              console.warn("[UI Stream Debug] Port disconnected but placeholder message might be incomplete or empty.");
+              // Option: Update placeholder to show an error
+              return prev.map(m => m.id === placeholderId ? {...m, content: "Error: Stream disconnected unexpectedly."} : m);
+            }
+            return prev; // Otherwise, no change needed
+          });
+        });
+
+      } catch (error) {
+        console.error("[UI Debug] Error establishing port connection or sending initial message:", error);
+        // Update placeholder to show connection error
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === placeholderId ? { ...m, content: `Error: Failed to connect to backend. ${error instanceof Error ? error.message : ''}` } : m
+          )
+        );
+        setIsWaitingForResponse(false);
+      }
   }
 
   // Update the summary button to get content, then send the summary prompt
@@ -286,9 +309,29 @@ function IndexSidePanel() {
     // ... (checks remain the same) ...
 
     // 3. Send Summary Message (handleSendMessage will add context if needed)
-    // console.log("[UI Debug] Content extraction successful, sending summary prompt.") // Removed log
-    const fakeEvent = { target: { value: SUMMARIZE_PROMPT_TEMPLATE } } // Simplified fake event
-    handleSendMessage(fakeEvent)
+    // Create the user message object with the flag
+    const userMessagePayload: ChatMessageWithId = {
+        role: 'user',
+        content: SUMMARIZE_PROMPT_TEMPLATE,
+        isActionTriggered: true // Add the flag here
+    };
+    
+    // Simulate the event structure handleSendMessage expects for non-form events
+    // const fakeEvent = { target: { value: SUMMARIZE_PROMPT_TEMPLATE } };
+    
+    // Note: handleSendMessage will internally create its *own* user message object.
+    // We need to adjust handleSendMessage slightly, or pass the flag differently.
+    // Let's adjust handleSendMessage to accept an optional pre-built message object.
+    
+    // Temporarily, let's just call handleSendMessage and set the flag afterwards (less ideal)
+    // handleSendMessage(fakeEvent); 
+
+    // Mark summary as generated for this content (to remove the button)
+    // setIsSummaryGenerated(true);
+    
+    // // Ideal approach: Modify handleSendMessage to take the flagged object
+    handleSendMessage(undefined, userMessagePayload); // Pass undefined for event, provide payload
+    setIsSummaryGenerated(true); // Mark summary as generated *after* calling send
   }
 
   // Effect to scroll to bottom when messages change
@@ -387,17 +430,19 @@ function IndexSidePanel() {
                 borderTop: "1px solid #eee",
                 paddingTop: "10px"
               }}>
-              <button
-                onClick={handleSummarize}
-                disabled={isExtracting || !extractedContent || !user} // Disable if extracting, no content, or not logged in
-              >
-                {/* {isSummarizing ? "Summarizing..." : "Summary"} */}
-                {isExtracting ? "Loading Page..." : "Summary"} {/* Show loading state based on isExtracting */}
-              </button>
+              {/* Conditionally render the button based on summary generation status */}
+              {!isSummaryGenerated && (
+                  <button
+                      onClick={handleSummarize}
+                      disabled={isExtracting || !extractedContent || !user} // Keep original disable logic minus the isSummaryGenerated check
+                  >
+                      {isExtracting ? "Loading Page..." : "Summary"}
+                  </button>
+              )}
               {extractionError && (
-                <p style={{ color: "red", marginTop: "10px" }}>
-                  Error: {extractionError}
-                </p>
+                  <p style={{ color: "red", marginTop: "10px" }}>
+                      Error: {extractionError}
+                  </p>
               )}
               {/* Comment out the debug display for extracted content */}
               {/* {extractedContent && (...)} */}

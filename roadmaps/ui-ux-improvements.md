@@ -9,10 +9,10 @@ This document outlines the prioritized tasks for improving the UI/UX of the WebC
     - **Goal:** Only display the sign-in option when the user is logged out. Hide the chat interface (message list, input form) and action buttons (Summary).
     - **Implementation:** Use conditional rendering in `sidepanel.tsx` based on the `user` state.
 
-2.  **Summary Button Logic:**
+2.  **Summary Button Logic:** `[DONE]`
 
-    - **Goal:** Prevent the "Summary" button from being used repeatedly for the same page content.
-    - **Implementation:** Introduce new state (`isSummaryGeneratedForCurrentPage: boolean`). Set to `true` when summary is requested. Reset to `false` when `handleGetContent` successfully loads _new_ content. Conditionally render/disable the button based on this state, login status, and content availability.
+    - **Goal:** Prevent the "Summary" button from being used repeatedly for the same page content. Remove button after use and highlight the corresponding user message in chat.
+    - **Implementation:** Introduce `isSummaryGenerated` state, conditionally render button based on it, add `isActionTriggered` flag to message, add CSS highlight animation.
 
 3.  **Loading Indicator (Chat Response):**
 

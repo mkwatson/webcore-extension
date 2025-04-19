@@ -13,3 +13,32 @@
   text-decoration: none;
   width: 100%;
 }
+
+@keyframes highlight-pulse {
+  0% {
+    background-color: #a8d3ff; /* Lighter blue highlight start */
+    box-shadow: 0 0 3px 1px #a8d3ff;
+  }
+  50% {
+    background-color: #cce0ff; /* Slightly different blue mid-pulse */
+    box-shadow: 0 0 6px 2px #cce0ff;
+  }
+  100% {
+    background-color: #d1e7ff; /* Return to original user message background */
+    box-shadow: none;
+  }
+}
+
+.message--highlight-action {
+  /* Apply the animation */
+  animation-name: highlight-pulse;
+  animation-duration: 1.5s; /* Duration of the highlight effect */
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1; /* Run only once */
+  animation-fill-mode: forwards; /* Keep the end state (original background) */
+}
+
+/* Base message styles (optional, if not handled inline) */
+.message {
+  /* Add any base styles shared by all messages if needed */
+}
