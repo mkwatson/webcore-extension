@@ -53,16 +53,23 @@ const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
                 marginLeft: msg.role === "user" ? "auto" : "10px", // Align user right, assistant left
                 marginRight: msg.role === "user" ? "10px" : "auto"
               }}>
-              {/* Use pre-wrap to respect newlines in message content */}
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  margin: 0,
-                  fontFamily: "inherit"
-                }}>
-                {msg.content}
-              </pre>
+              {/* Style the loading indicator differently */}
+              {msg.content === "..." ? (
+                <div style={{ textAlign: 'center', color: '#6c757d', fontStyle: 'italic' }}>
+                  {msg.content}
+                </div>
+              ) : (
+                /* Use pre-wrap for regular message content */
+                <pre
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    margin: 0,
+                    fontFamily: "inherit"
+                  }}>
+                  {msg.content}
+                </pre>
+              )}
             </div>
           )
         })}

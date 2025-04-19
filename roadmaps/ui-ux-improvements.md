@@ -14,10 +14,10 @@ This document outlines the prioritized tasks for improving the UI/UX of the WebC
     - **Goal:** Prevent the "Summary" button from being used repeatedly for the same page content. Remove button after use and highlight the corresponding user message in chat.
     - **Implementation:** Introduce `isSummaryGenerated` state, conditionally render button based on it, add `isActionTriggered` flag to message, add CSS highlight animation.
 
-3.  **Loading Indicator (Chat Response):**
+3.  **Loading Indicator (Chat Response):** `[DONE]`
 
     - **Goal:** Provide visual feedback to the user while waiting for the AI's response after sending a message.
-    - **Implementation:** Use the existing `isWaitingForResponse` state in `sidepanel.tsx`. Render a simple indicator (e.g., "Assistant is thinking...", a subtle animation) near the input form or within the message list when this state is true.
+    - **Implementation:** Initialize assistant placeholder message content with `"..."` and style it distinctively (centered, italic, grey) in `MessageList.tsx` until replaced by streaming content.
 
 4.  **Signed-In User Info (Subtle Relocation):**
 

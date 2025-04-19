@@ -156,7 +156,7 @@ function IndexSidePanel() {
       const placeholderMessage: ChatMessageWithId = {
         id: placeholderId,
         role: "assistant",
-        content: ""
+        content: "..." // Set initial content to loading indicator
       }
 
       // Build the message array: *only* chat history + new user message
